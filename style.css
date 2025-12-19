@@ -1,11 +1,12 @@
-/* ========== БАЗОВЫЕ СТИЛИ И ПЕРЕМЕННЫЕ ========== */
+/* ========== ОСНОВНЫЕ СТИЛИ ========== */
 :root {
-    /* Цветовая схема 90-х */
+    /* Цветовая схема */
     --primary-green: #00ff00;
     --primary-dark: #00aa00;
     --cyan: #00ffff;
     --yellow: #ffff00;
     --red: #ff0000;
+    --orange: #ff9900;
     --purple: #ff00ff;
     --background: #000000;
     --surface: #001a00;
@@ -14,812 +15,21 @@
     --text: #00ff00;
     --text-muted: #00aa00;
     
-    /* Адаптивные размеры */
-    --header-height: 70px;
-    --footer-height: 60px;
-    --sidebar-width: 300px;
-    
-    /* Отступы */
-    --space-xs: 5px;
-    --space-sm: 10px;
-    --space-md: 15px;
-    --space-lg: 20px;
-    --space-xl: 30px;
-    --space-xxl: 40px;
-    
-    /* Тени и эффекты */
-    --glow: 0 0 10px currentColor;
-    --glow-strong: 0 0 20px currentColor;
-    --panel-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    /* Цвета статусов */
+    --status-normal: #00ff00;
+    --status-tracked: #00ffff;
+    --status-warning: #ffff00;
+    --status-critical: #ff0000;
+    --status-destroyed: #ff00ff;
     
     /* Анимации */
-    --transition: all 0.3s ease;
+    --animation-slow: 3s;
+    --animation-normal: 1s;
+    --animation-fast: 0.3s;
 }
 
-/* ========== СБРОС И ОСНОВНЫЕ СТИЛИ ========== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-html {
-    font-size: 16px;
-    height: 100%;
-    overflow-x: hidden;
-}
-
-body {
-    font-family: 'Courier New', 'Consolas', monospace;
-    background: var(--background);
-    color: var(--text);
-    line-height: 1.5;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-}
-
-/* ========== АНИМАЦИИ ========== */
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes sweep {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes star-twinkle {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
-}
-
-@keyframes slideIn {
-    from { transform: translateX(-100%); }
-    to { transform: translateX(0); }
-}
-
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
-
-@keyframes typing {
-    from { width: 0; }
-    to { width: 100%; }
-}
-
-@keyframes marquee-scroll {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-}
-
-.blink {
-    animation: blink 1s infinite;
-}
-
-.pulse {
-    animation: pulse 2s infinite;
-}
-
-.float {
-    animation: float 3s ease-in-out infinite;
-}
-
-/* ========== СТАРФИЛД ========== */
-.starfield {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-}
-
-.star {
-    position: absolute;
-    background: white;
-    border-radius: 50%;
-}
-
-.star.small {
-    width: 1px;
-    height: 1px;
-    opacity: 0.7;
-}
-
-.star.medium {
-    width: 2px;
-    height: 2px;
-    opacity: 0.9;
-}
-
-.star.large {
-    width: 3px;
-    height: 3px;
-    opacity: 1;
-}
-
-.star.twinkling {
-    animation: star-twinkle 3s infinite alternate;
-}
-
-/* ========== АДАПТИВНЫЙ КОНТЕЙНЕР ========== */
-.container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    padding: var(--space-md);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-/* ========== ШАПКА ========== */
-header {
-    background: linear-gradient(180deg, #001a00 0%, #000 100%);
-    border: 3px double var(--border);
-    position: relative;
-    z-index: 100;
-    box-shadow: var(--panel-shadow);
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--space-md);
-    flex-wrap: wrap;
-    gap: var(--space-md);
-}
-
-.logo-container {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    flex: 1;
-    min-width: 280px;
-}
-
-.logo {
-    width: 60px;
-    height: 60px;
-    filter: hue-rotate(90deg) brightness(1.5);
-    animation: spin 20s linear infinite;
-}
-
-.header-text {
-    flex: 1;
-}
-
-h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: clamp(1.5rem, 4vw, 2.2rem);
-    color: var(--cyan);
-    text-shadow: var(--glow-strong);
-    letter-spacing: 1px;
-    line-height: 1.2;
-}
-
-.header-subtitle {
-    font-size: clamp(0.8rem, 2vw, 0.9rem);
-    color: var(--text-muted);
-    margin-top: var(--space-xs);
-}
-
-/* Статус бар для десктопа */
-.status-bar {
-    display: flex;
-    gap: var(--space-xl);
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid var(--border);
-    padding: var(--space-sm) var(--space-md);
-    border-radius: var(--space-xs);
-    min-width: 500px;
-}
-
-.status-bar .status-group {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    white-space: nowrap;
-}
-
-.status-label {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.mode, .system-status {
-    color: var(--yellow);
-    font-weight: bold;
-    text-shadow: 0 0 5px var(--yellow);
-}
-
-#clock {
-    color: var(--cyan);
-    font-family: 'Press Start 2P', cursive;
-    font-size: 0.85rem;
-    min-width: 120px;
-}
-
-/* Мобильный статус бар */
-.mobile-status-bar {
-    display: none;
-    background: rgba(0, 0, 0, 0.9);
-    border-top: 1px solid var(--border);
-    padding: var(--space-sm);
-    font-size: 0.8rem;
-}
-
-.mobile-status {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Бегущая строка */
-.marquee-container {
-    background: linear-gradient(90deg, #002200 0%, #004400 50%, #002200 100%);
-    border-top: 1px solid var(--border);
-    padding: var(--space-sm);
-    overflow: hidden;
-    position: relative;
-    height: 32px;
-}
-
-.marquee-content {
-    position: absolute;
-    white-space: nowrap;
-    animation: marquee-scroll 30s linear infinite;
-    color: var(--yellow);
-    font-weight: bold;
-    font-size: 0.9rem;
-    padding-right: 50px;
-}
-
-/* ========== ГЛАВНОЕ СОДЕРЖИМОЕ ========== */
-.main-content {
-    display: flex;
-    gap: var(--space-lg);
-    flex: 1;
-    min-height: 0;
-}
-
-/* ========== БОКОВАЯ ПАНЕЛЬ ========== */
-.sidebar {
-    width: var(--sidebar-width);
-    flex-shrink: 0;
-    background: var(--surface);
-    border: 2px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.sidebar-header {
-    padding: var(--space-md);
-    background: linear-gradient(180deg, #002200 0%, #001a00 100%);
-    border-bottom: 1px solid var(--border);
-}
-
-.sidebar-header h2 {
-    color: var(--cyan);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: var(--space-md);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-/* Панели в сайдбаре */
-.panel {
-    background: rgba(0, 20, 0, 0.8);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: var(--space-md);
-}
-
-.panel h3 {
-    color: var(--cyan);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1rem;
-    margin-bottom: var(--space-md);
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    border-bottom: 1px solid var(--border);
-    padding-bottom: var(--space-sm);
-}
-
-/* Элементы управления галактикой */
-.galaxy-controls {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-}
-
-.control-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-}
-
-.control-group label {
-    color: var(--text);
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-
-select, input[type="range"] {
-    background: #000;
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: var(--space-sm);
-    border-radius: 3px;
-    font-family: inherit;
-    width: 100%;
-}
-
-select:focus, input[type="range"]:focus {
-    outline: none;
-    border-color: var(--cyan);
-    box-shadow: var(--glow);
-}
-
-/* Контролы зума и варпа */
-.zoom-control, .warp-controls {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: var(--space-sm);
-}
-
-.warp-buttons {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-xs);
-    margin-top: var(--space-sm);
-}
-
-.warp-btn {
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    padding: var(--space-sm);
-    border-radius: 3px;
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: center;
-    font-size: 0.9rem;
-}
-
-.warp-btn:hover, .warp-btn.active {
-    background: var(--primary-green);
-    color: #000;
-    box-shadow: var(--glow);
-}
-
-/* ========== ОСНОВНОЙ КОНТЕНТ ========== */
-.content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-    min-height: 0;
-}
-
-/* Контейнер карты - ГЛАВНОЕ ИЗМЕНЕНИЕ */
-.map-container {
-    flex: 1;
-    min-height: 600px; /* Увеличена минимальная высота */
-    height: calc(100vh - 300px); /* Занимает большую часть экрана */
-    max-height: 800px;
-    background: #000511;
-    border: 3px solid var(--border);
-    position: relative;
-    overflow: hidden;
-}
-
-.galaxy-map {
-    position: absolute;
-    width: 2000px;
-    height: 2000px;
-    transform-origin: center;
-    transition: transform 0.5s ease;
-}
-
-/* Планеты на карте */
-.planet {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    z-index: 10;
-}
-
-.earth {
-    top: 50%;
-    left: 50%;
-    width: 80px;
-    height: 80px;
-}
-
-.moon {
-    top: 30%;
-    left: 60%;
-    width: 30px;
-    height: 30px;
-}
-
-.mars {
-    top: 20%;
-    left: 20%;
-    width: 50px;
-    height: 50px;
-}
-
-.jupiter {
-    top: 70%;
-    left: 70%;
-    width: 120px;
-    height: 120px;
-}
-
-.planet-icon {
-    color: var(--cyan);
-    font-size: 2rem;
-    text-shadow: var(--glow-strong);
-    animation: float 5s infinite ease-in-out;
-}
-
-.planet-ring {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 2px dashed var(--border);
-    border-radius: 50%;
-    animation: spin 30s linear infinite;
-}
-
-.jupiter-ring {
-    width: 150px;
-    height: 150px;
-    border-color: var(--yellow);
-}
-
-/* Спутники на карте */
-.satellite-map {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    cursor: pointer;
-    z-index: 5;
-    transition: transform 0.3s ease;
-}
-
-.satellite-map:hover {
-    transform: translate(-50%, -50%) scale(1.5);
-    z-index: 20;
-}
-
-.satellite-icon {
-    color: var(--cyan);
-    font-size: 1.2rem;
-    text-shadow: var(--glow);
-    animation: float 3s infinite ease-in-out;
-}
-
-.satellite-icon.warning {
-    color: var(--yellow);
-}
-
-.satellite-icon.critical {
-    color: var(--red);
-    animation: blink 0.5s infinite;
-}
-
-/* Элементы управления картой */
-.map-controls-overlay {
-    position: absolute;
-    top: var(--space-md);
-    right: var(--space-md);
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    background: rgba(0, 0, 0, 0.7);
-    border: 1px solid var(--border);
-    padding: var(--space-md);
-    border-radius: 4px;
-}
-
-.map-control-btn {
-    width: 40px;
-    height: 40px;
-    background: var(--surface);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-}
-
-.map-control-btn:hover {
-    background: var(--primary-green);
-    color: #000;
-    box-shadow: var(--glow);
-}
-
-.map-coordinates {
-    margin-top: var(--space-sm);
-    padding-top: var(--space-sm);
-    border-top: 1px solid var(--border);
-    font-size: 0.9rem;
-    color: var(--cyan);
-    text-align: center;
-    min-width: 120px;
-}
-
-/* Навигация карты */
-.map-navigation {
-    position: absolute;
-    bottom: var(--space-md);
-    left: 50%;
-    transform: translateX(-50%);
-    display: grid;
-    grid-template-columns: repeat(3, 40px);
-    grid-template-rows: repeat(3, 40px);
-    gap: var(--space-xs);
-    z-index: 100;
-}
-
-.map-navigation .nav-btn {
-    background: rgba(0, 0, 0, 0.7);
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: var(--transition);
-}
-
-.map-navigation .nav-btn:hover {
-    background: var(--primary-green);
-    color: #000;
-    box-shadow: var(--glow);
-}
-
-/* Позиционирование кнопок навигации */
-#btn-pan-up {
-    grid-column: 2;
-    grid-row: 1;
-}
-
-#btn-pan-left {
-    grid-column: 1;
-    grid-row: 2;
-}
-
-#btn-pan-center {
-    grid-column: 2;
-    grid-row: 2;
-    background: var(--surface-light);
-}
-
-#btn-pan-right {
-    grid-column: 3;
-    grid-row: 2;
-}
-
-#btn-pan-down {
-    grid-column: 2;
-    grid-row: 3;
-}
-
-/* Быстрая статистика */
-.quick-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-md);
-    margin-top: var(--space-md);
-}
-
-.stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: var(--space-md);
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-}
-
-.stat-icon {
-    width: 50px;
-    height: 50px;
-    background: rgba(0, 255, 0, 0.1);
-    border: 1px solid var(--border);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-}
-
-.stat-content {
-    flex: 1;
-}
-
-.stat-value {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: var(--cyan);
-    font-family: 'Orbitron', sans-serif;
-}
-
-.stat-label {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin-top: var(--space-xs);
-}
-
-/* ========== ПОДВАЛ ========== */
-footer {
-    background: linear-gradient(0deg, #001a00 0%, #000 100%);
-    border: 3px double var(--border);
-    margin-top: auto;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    flex-wrap: wrap;
-    gap: var(--space-md);
-}
-
-.footer-section {
-    flex: 1;
-    min-width: 250px;
-}
-
-.footer-logo {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-}
-
-.footer-logo i {
-    font-size: 2rem;
-    color: var(--cyan);
-}
-
-.footer-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
-    color: var(--cyan);
-}
-
-.footer-subtitle {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.visitor-info {
-    display: flex;
-    gap: var(--space-xl);
-    justify-content: center;
-}
-
-.visitor-stat {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.visitor-stat i {
-    font-size: 1.5rem;
-    color: var(--yellow);
-}
-
-.visitor-stat .stat-label {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.visitor-stat .stat-value {
-    font-size: 1.2rem;
-    color: var(--text);
-    font-family: 'Press Start 2P', cursive;
-}
-
-.transmission-status {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: var(--space-sm);
-}
-
-.status-indicator {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-}
-
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--text-muted);
-}
-
-.status-dot.active {
-    background: var(--primary-green);
-    box-shadow: 0 0 10px var(--primary-green);
-    animation: blink 2s infinite;
-}
-
-.footer-bottom {
-    border-top: 1px solid var(--border);
-    padding: var(--space-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-md);
-}
-
-.copyright {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.construction-notice {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: var(--yellow);
-    font-size: 0.9rem;
-}
-
-/* ========== МОДАЛЬНЫЕ ОКНА ========== */
-.modal-overlay {
+/* ========== ПРЕДУПРЕЖДЕНИЕ О САМОУНИЧТОЖЕНИИ ========== */
+.destruction-warning {
     display: none;
     position: fixed;
     top: 0;
@@ -827,855 +37,1187 @@ footer {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.95);
-    z-index: 2000;
+    z-index: 9999;
     align-items: center;
     justify-content: center;
-    padding: var(--space-md);
+    padding: 20px;
 }
 
-.modal {
-    background: linear-gradient(180deg, #001a00 0%, #000 100%);
-    border: 3px solid var(--cyan);
+.warning-modal {
+    background: linear-gradient(135deg, #220000 0%, #000 100%);
+    border: 4px solid var(--red);
     border-radius: 8px;
     max-width: 600px;
     width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 0 40px var(--cyan);
+    box-shadow: 0 0 50px var(--red);
+    animation: pulse 2s infinite;
 }
 
-.modal-header {
-    padding: var(--space-lg);
-    border-bottom: 2px solid var(--cyan);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.warning-header {
+    background: rgba(255, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid var(--red);
 }
 
-.modal-header h3 {
-    color: var(--cyan);
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.3rem;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    color: var(--text);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: var(--space-xs);
-    transition: var(--transition);
-}
-
-.modal-close:hover {
+.warning-header i {
+    font-size: 3rem;
     color: var(--red);
-    transform: scale(1.1);
+    margin-bottom: 10px;
+    display: block;
 }
 
-.modal-body {
-    padding: var(--space-lg);
+.warning-header h2 {
+    color: var(--red);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px var(--red);
 }
 
-.modal-footer {
-    padding: var(--space-lg);
-    border-top: 1px solid var(--border);
-    display: flex;
-    gap: var(--space-md);
-    justify-content: flex-end;
+.warning-body {
+    padding: 30px;
 }
 
-.modal-btn {
-    padding: var(--space-sm) var(--space-lg);
-    border: 1px solid var(--border);
-    background: var(--surface);
+.warning-body p {
+    color: var(--yellow);
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.warning-body ul {
+    list-style: none;
+    margin: 20px 0;
+    padding-left: 20px;
+}
+
+.warning-body li {
     color: var(--text);
+    margin-bottom: 10px;
+    padding-left: 25px;
+    position: relative;
+}
+
+.warning-body li:before {
+    content: '⚠';
+    position: absolute;
+    left: 0;
+    color: var(--red);
+}
+
+.confirmation {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--yellow);
     border-radius: 4px;
+}
+
+.confirmation label {
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
-    transition: var(--transition);
+}
+
+.confirmation input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--red);
+}
+
+.warning-footer {
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.warning-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 4px;
     font-family: inherit;
     font-weight: bold;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: var(--animation-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
-.modal-btn:hover {
-    background: var(--primary-green);
-    color: #000;
-    box-shadow: var(--glow);
+.warning-btn.cancel {
+    background: var(--surface);
+    color: var(--text);
+    border: 2px solid var(--border);
 }
 
-.modal-btn.secondary {
-    background: transparent;
-    border-color: var(--cyan);
-    color: var(--cyan);
+.warning-btn.cancel:hover {
+    background: var(--surface-light);
+    box-shadow: 0 0 15px var(--primary-green);
 }
 
-/* ========== АДАПТИВНЫЕ СТИЛИ ДЛЯ РАЗНЫХ УСТРОЙСТВ ========== */
-
-/* 1. Большие мониторы (1920px и выше) */
-@media screen and (min-width: 1920px) {
-    .container {
-        max-width: 1800px;
-        padding: var(--space-lg);
-    }
-    
-    .map-container {
-        height: calc(100vh - 250px);
-        max-height: 900px;
-    }
-    
-    .sidebar {
-        width: 350px;
-    }
-    
-    h1 {
-        font-size: 2.5rem;
-    }
-    
-    .status-bar {
-        font-size: 1rem;
-        padding: var(--space-md) var(--space-lg);
-    }
+.warning-btn.destroy {
+    background: linear-gradient(135deg, #ff0000 0%, #990000 100%);
+    color: white;
+    border: 2px solid var(--red);
 }
 
-/* 2. Десктопы среднего размера (1440px - 1919px) */
-@media screen and (min-width: 1440px) and (max-width: 1919px) {
-    .container {
-        max-width: 1400px;
-    }
-    
-    .map-container {
-        height: calc(100vh - 280px);
-        max-height: 750px;
-    }
-    
-    .sidebar {
-        width: 320px;
-    }
-    
-    h1 {
-        font-size: 2rem;
-    }
+.warning-btn.destroy:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+    box-shadow: 0 0 20px var(--red);
+    transform: scale(1.05);
 }
 
-/* 3. Ноутбуки и маленькие десктопы (1024px - 1439px) */
-@media screen and (min-width: 1024px) and (max-width: 1439px) {
-    .container {
-        max-width: 1200px;
-        padding: var(--space-md);
-    }
-    
-    .map-container {
-        min-height: 500px;
-        height: calc(100vh - 320px);
-        max-height: 650px;
-    }
-    
-    .sidebar {
-        width: 280px;
-    }
-    
-    .header-content {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .status-bar {
-        min-width: 100%;
-        justify-content: space-between;
-    }
-    
-    .quick-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
+.warning-btn.destroy:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-/* 4. Планшеты в горизонтальной ориентации (768px - 1023px) */
-@media screen and (min-width: 768px) and (max-width: 1023px) {
-    .container {
-        padding: var(--space-sm);
-    }
-    
-    .main-content {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        order: 2;
-        margin-top: var(--space-lg);
-    }
-    
-    .content {
-        order: 1;
-    }
-    
-    .map-container {
-        min-height: 500px;
-        height: 60vh;
-        max-height: 600px;
-    }
-    
-    .status-bar {
-        display: none;
-    }
-    
-    .mobile-status-bar {
-        display: block;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--space-lg);
-    }
-    
-    .footer-section {
-        width: 100%;
-    }
-    
-    .visitor-info {
-        justify-content: center;
-    }
-    
-    .transmission-status {
-        align-items: center;
-    }
-    
-    .quick-stats {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .map-controls-overlay {
-        top: auto;
-        bottom: var(--space-md);
-        right: var(--space-md);
-        flex-direction: row;
-    }
-    
-    .map-navigation {
-        bottom: 80px;
-    }
+/* ========== ПАНЕЛЬ ОТСЛЕЖИВАНИЯ ========== */
+.tracking-panel {
+    background: linear-gradient(135deg, #001a00 0%, #000 100%);
 }
 
-/* 5. Планшеты в вертикальной ориентации (600px - 767px) */
-@media screen and (min-width: 600px) and (max-width: 767px) {
-    .container {
-        padding: var(--space-sm);
-    }
-    
-    .header-content {
-        flex-direction: column;
-        padding: var(--space-sm);
-    }
-    
-    .logo-container {
-        min-width: 100%;
-        justify-content: center;
-        text-align: center;
-    }
-    
-    .header-text {
-        text-align: center;
-    }
-    
-    .status-bar {
-        display: none;
-    }
-    
-    .mobile-status-bar {
-        display: block;
-    }
-    
-    .main-content {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        order: 2;
-        display: none; /* Скрываем по умолчанию, показываем по кнопке */
-    }
-    
-    .sidebar.active {
-        display: flex;
-        animation: slideUp 0.3s ease;
-    }
-    
-    .content {
-        order: 1;
-    }
-    
-    .map-container {
-        min-height: 400px;
-        height: 55vh;
-        max-height: 500px;
-    }
-    
-    .quick-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .map-controls-overlay {
-        top: var(--space-sm);
-        right: var(--space-sm);
-        padding: var(--space-sm);
-    }
-    
-    .map-control-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
-    }
-    
-    .map-navigation {
-        bottom: 70px;
-    }
-    
-    .nav-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
-    }
-    
-    .footer-content {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--space-lg);
-    }
-    
-    .footer-section {
-        width: 100%;
-    }
-    
-    .construction-notice {
-        display: none;
-    }
+.tracking-controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
-/* 6. Большие телефоны (425px - 599px) */
-@media screen and (min-width: 425px) and (max-width: 599px) {
-    html {
-        font-size: 15px;
-    }
-    
-    .container {
-        padding: var(--space-xs);
-    }
-    
-    .header-content {
-        padding: var(--space-xs) var(--space-sm);
-    }
-    
-    .logo {
-        width: 50px;
-        height: 50px;
-    }
-    
-    h1 {
-        font-size: 1.3rem;
-        line-height: 1.3;
-    }
-    
-    .marquee-container {
-        height: 28px;
-        padding: 5px;
-    }
-    
-    .marquee-content {
-        font-size: 0.8rem;
-    }
-    
-    .map-container {
-        min-height: 350px;
-        height: 50vh;
-        border-width: 2px;
-    }
-    
-    .planet-icon {
-        font-size: 1.5rem;
-    }
-    
-    .earth {
-        width: 60px;
-        height: 60px;
-    }
-    
-    .jupiter {
-        width: 90px;
-        height: 90px;
-    }
-    
-    .satellite-icon {
-        font-size: 1rem;
-    }
-    
-    .quick-stats {
-        grid-template-columns: 1fr;
-        gap: var(--space-sm);
-    }
-    
-    .stat-card {
-        padding: var(--space-sm);
-    }
-    
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-    }
-    
-    .stat-value {
-        font-size: 1.5rem;
-    }
-    
-    .map-controls-overlay {
-        top: var(--space-xs);
-        right: var(--space-xs);
-        padding: var(--space-xs);
-    }
-    
-    .map-control-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
-    }
-    
-    .map-navigation {
-        bottom: 60px;
-        gap: 3px;
-    }
-    
-    .nav-btn {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
-    }
-    
-    .footer-content {
-        padding: var(--space-sm);
-    }
-    
-    .footer-title {
-        font-size: 1rem;
-    }
-    
-    .footer-subtitle {
-        font-size: 0.8rem;
-    }
-    
-    .visitor-info {
-        flex-direction: column;
-        gap: var(--space-sm);
-    }
-    
-    .footer-bottom {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--space-sm);
-    }
-}
-
-/* 7. Маленькие телефоны (до 424px) */
-@media screen and (max-width: 424px) {
-    html {
-        font-size: 14px;
-    }
-    
-    .container {
-        padding: 8px;
-    }
-    
-    .header-content {
-        padding: 10px;
-    }
-    
-    .logo-container {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-    
-    .logo {
-        width: 45px;
-        height: 45px;
-    }
-    
-    h1 {
-        font-size: 1.1rem;
-        line-height: 1.2;
-    }
-    
-    .header-subtitle {
-        font-size: 0.75rem;
-    }
-    
-    .marquee-container {
-        height: 26px;
-        padding: 4px;
-    }
-    
-    .marquee-content {
-        font-size: 0.75rem;
-    }
-    
-    .map-container {
-        min-height: 300px;
-        height: 45vh;
-        border-width: 1px;
-    }
-    
-    .planet-icon {
-        font-size: 1.2rem;
-    }
-    
-    .earth {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .jupiter {
-        width: 70px;
-        height: 70px;
-    }
-    
-    .satellite-icon {
-        font-size: 0.9rem;
-    }
-    
-    .quick-stats {
-        grid-template-columns: 1fr;
-        gap: 10px;
-    }
-    
-    .stat-card {
-        padding: 10px;
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    
-    .stat-icon {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .stat-value {
-        font-size: 1.3rem;
-    }
-    
-    .stat-label {
-        font-size: 0.8rem;
-    }
-    
-    .map-controls-overlay {
-        top: 5px;
-        right: 5px;
-        padding: 8px;
-    }
-    
-    .map-control-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
-    }
-    
-    .map-coordinates {
-        min-width: 90px;
-        font-size: 0.75rem;
-    }
-    
-    .map-navigation {
-        bottom: 50px;
-        gap: 2px;
-    }
-    
-    .nav-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 0.75rem;
-    }
-    
-    .footer-content {
-        padding: 10px;
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .footer-section {
-        min-width: 100%;
-    }
-    
-    .footer-logo {
-        justify-content: center;
-        text-align: center;
-    }
-    
-    .visitor-info {
-        flex-direction: column;
-        gap: 15px;
-    }
-    
-    .footer-bottom {
-        padding: 10px;
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    
-    .copyright {
-        font-size: 0.8rem;
-    }
-    
-    .modal {
-        max-height: 85vh;
-    }
-    
-    .modal-header {
-        padding: 15px;
-    }
-    
-    .modal-body {
-        padding: 15px;
-    }
-    
-    .modal-footer {
-        padding: 15px;
-        flex-direction: column;
-    }
-    
-    .modal-btn {
-        width: 100%;
-    }
-}
-
-/* 8. Портретная ориентация на мобильных */
-@media screen and (max-width: 767px) and (orientation: portrait) {
-    .map-container {
-        height: 40vh !important;
-    }
-    
-    .sidebar-content {
-        max-height: 50vh;
-        overflow-y: auto;
-    }
-    
-    /* Предупреждение о повороте устройства */
-    .device-warning {
-        display: flex;
-    }
-    
-    .container {
-        filter: blur(2px);
-    }
-}
-
-/* 9. Ландшафтная ориентация на мобильных */
-@media screen and (max-width: 900px) and (orientation: landscape) {
-    .container {
-        padding: var(--space-xs);
-    }
-    
-    .header-content {
-        padding: var(--space-xs);
-    }
-    
-    h1 {
-        font-size: 1.2rem;
-    }
-    
-    .logo {
-        width: 40px;
-        height: 40px;
-    }
-    
-    .map-container {
-        min-height: 300px;
-        height: 65vh;
-    }
-    
-    .sidebar {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-    
-    .quick-stats {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .device-warning {
-        display: none !important;
-    }
-}
-
-/* 10. Очень высокие экраны (соотношение больше 16:9) */
-@media screen and (min-height: 1000px) and (min-width: 768px) {
-    .map-container {
-        height: calc(100vh - 250px);
-        max-height: 1000px;
-    }
-    
-    .sidebar-content {
-        max-height: 70vh;
-        overflow-y: auto;
-    }
-}
-
-/* 11. Touch устройства */
-@media (hover: none) and (pointer: coarse) {
-    .map-control-btn, .nav-btn, .warp-btn, .modal-btn {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
-    select, input {
-        font-size: 16px; /* Предотвращает авто-зум на iOS */
-    }
-    
-    .satellite-map:hover {
-        transform: translate(-50%, -50%) scale(1);
-    }
-    
-    /* Увеличиваем область клика для спутников на мобильных */
-    .satellite-map {
-        padding: 15px;
-        margin: -15px;
-    }
-    
-    .satellite-icon {
-        position: relative;
-        z-index: 1;
-    }
-}
-
-/* 12. Печать */
-@media print {
-    .starfield,
-    .map-controls-overlay,
-    .map-navigation,
-    .sidebar,
-    .mobile-status-bar,
-    .marquee-container,
-    .footer,
-    .modal-overlay {
-        display: none !important;
-    }
-    
-    .container {
-        color: #000;
-        background: #fff;
-    }
-    
-    .map-container {
-        border: 1px solid #000;
-        height: auto;
-        min-height: 500px;
-    }
-    
-    a {
-        color: #000;
-        text-decoration: underline;
-    }
-}
-
-/* ========== СПЕЦИАЛЬНЫЕ КЛАССЫ ДЛЯ JS ========== */
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: var(--space-md);
-    left: var(--space-md);
-    z-index: 1000;
+.track-btn {
     background: var(--surface);
     border: 2px solid var(--border);
     color: var(--text);
-    padding: var(--space-sm) var(--space-md);
+    padding: 12px 8px;
     border-radius: 4px;
-    font-family: inherit;
+    cursor: pointer;
+    transition: var(--animation-fast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.track-btn:hover {
+    background: var(--surface-light);
+    box-shadow: 0 0 10px var(--primary-green);
+}
+
+.track-btn i {
+    font-size: 1.2rem;
+}
+
+#track-all {
+    border-color: var(--cyan);
+}
+
+#track-all:hover {
+    box-shadow: 0 0 10px var(--cyan);
+}
+
+#track-important {
+    border-color: var(--yellow);
+}
+
+#track-important:hover {
+    box-shadow: 0 0 10px var(--yellow);
+}
+
+.tracking-list-container {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.tracking-list-header {
+    background: var(--surface);
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+}
+
+.tracking-list-header span {
+    color: var(--cyan);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.clear-tracked {
+    background: none;
+    border: 1px solid var(--red);
+    color: var(--red);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--animation-fast);
+}
+
+.clear-tracked:hover {
+    background: var(--red);
+    color: black;
+    box-shadow: 0 0 10px var(--red);
+}
+
+.tracking-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.tracking-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: var(--animation-fast);
+}
+
+.tracking-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.tracking-item.active {
+    background: rgba(0, 255, 255, 0.1);
+    border-left: 4px solid var(--cyan);
+}
+
+.tracking-item .sat-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tracking-item .sat-icon {
+    width: 24px;
+    height: 24px;
+    background: var(--surface);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tracking-item .sat-icon i {
+    font-size: 0.9rem;
+    color: var(--cyan);
+}
+
+.tracking-item .sat-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.tracking-item .sat-name {
+    font-weight: bold;
+    color: var(--text);
+    font-size: 1rem;
+}
+
+.tracking-item .sat-status {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.tracking-item .sat-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.tracking-item .action-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--animation-fast);
+}
+
+.tracking-item .action-btn:hover {
+    background: var(--surface-light);
+    box-shadow: 0 0 5px var(--primary-green);
+}
+
+.tracking-stats {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.tracking-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 255, 0, 0.1);
+}
+
+.tracking-stat:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.tracking-stat span:first-child {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.tracking-stat span:last-child {
+    color: var(--cyan);
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+}
+
+/* ========== ПАНЕЛЬ ВЫБРАННОГО СПУТНИКА ========== */
+.selected-satellite {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.no-selection {
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.no-selection i {
+    font-size: 3rem;
+    color: var(--text-muted);
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.no-selection p {
+    font-size: 0.9rem;
+}
+
+.satellite-details {
+    width: 100%;
+}
+
+.satellite-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.satellite-header .sat-icon {
+    width: 50px;
+    height: 50px;
+    background: var(--surface);
+    border: 2px solid var(--cyan);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.satellite-header .sat-icon i {
+    font-size: 1.5rem;
+    color: var(--cyan);
+}
+
+.satellite-header .sat-title {
+    flex: 1;
+}
+
+.satellite-header .sat-title h3 {
+    color: var(--cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 5px;
+}
+
+.satellite-header .sat-title .sat-id {
+    color: var(--text-muted);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+}
+
+.satellite-data {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.data-item {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 255, 0, 0.2);
+}
+
+.data-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.data-value {
+    font-size: 1.1rem;
+    color: var(--text);
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* ========== КАРТА С ОТСЛЕЖИВАНИЕМ ========== */
+.tracking-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.tracking-line {
+    position: absolute;
+    background: rgba(0, 255, 255, 0.3);
+    height: 2px;
+    transform-origin: 0 0;
+    pointer-events: none;
+}
+
+.tracking-line::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--cyan) 50%, 
+        transparent 100%);
+    animation: pulse-line 2s infinite;
+}
+
+@keyframes pulse-line {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+.satellite-map.tracked {
+    z-index: 20;
+}
+
+.satellite-map.tracked .satellite-icon {
+    animation: pulse-tracked 1s infinite;
+}
+
+@keyframes pulse-tracked {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+}
+
+.map-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+}
+
+.legend-color.normal {
+    background: var(--status-normal);
+    box-shadow: 0 0 5px var(--status-normal);
+}
+
+.legend-color.tracked {
+    background: var(--status-tracked);
+    box-shadow: 0 0 5px var(--status-tracked);
+}
+
+.legend-color.warning {
+    background: var(--status-warning);
+    box-shadow: 0 0 5px var(--status-warning);
+    animation: blink 1s infinite;
+}
+
+.legend-color.critical {
+    background: var(--status-critical);
+    box-shadow: 0 0 5px var(--status-critical);
+    animation: blink 0.5s infinite;
+}
+
+.legend-color.destroyed {
+    background: var(--status-destroyed);
+    box-shadow: 0 0 5px var(--status-destroyed);
+}
+
+/* ========== РАДАР ВНИЗУ ========== */
+.radar-panel {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #000511 0%, #000 100%);
+}
+
+.radar-container {
+    display: flex;
+    gap: 20px;
+    min-height: 350px;
+}
+
+.radar-display {
+    flex: 2;
+    position: relative;
+    background: #000;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#radar-canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.radar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.radar-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid var(--primary-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.radar-center i {
+    font-size: 1.5rem;
+    color: var(--primary-green);
+    animation: spin 5s linear infinite;
+}
+
+.radar-grid {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: 
+        radial-gradient(circle at center, transparent 0%, transparent 10%, rgba(0, 255, 0, 0.1) 10%, transparent 11%),
+        radial-gradient(circle at center, transparent 0%, transparent 30%, rgba(0, 255, 0, 0.1) 30%, transparent 31%),
+        radial-gradient(circle at center, transparent 0%, transparent 50%, rgba(0, 255, 0, 0.1) 50%, transparent 51%),
+        radial-gradient(circle at center, transparent 0%, transparent 70%, rgba(0, 255, 0, 0.1) 70%, transparent 71%),
+        radial-gradient(circle at center, transparent 0%, transparent 90%, rgba(0, 255, 0, 0.1) 90%, transparent 91%);
+}
+
+.radar-sweep {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 50%, rgba(0, 255, 255, 0.2) 50%);
+    transform-origin: center;
+    animation: sweep var(--animation-slow) linear infinite;
+}
+
+.radar-info {
+    position: absolute;
+    bottom: 10px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.radar-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.radar-stat span:first-child {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.radar-stat span:last-child {
+    font-size: 1.1rem;
+    color: var(--cyan);
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.radar-targets {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 15px;
+    min-width: 250px;
+}
+
+.radar-targets h3 {
+    color: var(--cyan);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.targets-list {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.target-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(0, 20, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: var(--animation-fast);
+}
+
+.target-item:hover {
+    background: rgba(0, 255, 0, 0.1);
+    border-color: var(--cyan);
+}
+
+.target-item.active {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: var(--cyan);
+}
+
+.target-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.target-name {
+    color: var(--text);
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.target-distance {
+    color: var(--cyan);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+}
+
+.target-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.target-type {
+    color: var(--text-muted);
+}
+
+.target-status {
+    color: var(--primary-green);
+    font-weight: bold;
+}
+
+.target-status.warning {
+    color: var(--yellow);
+}
+
+.target-status.critical {
+    color: var(--red);
+}
+
+.radar-telemetry {
+    margin-top: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 15px;
+}
+
+.telemetry-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.telemetry-item:last-child {
+    margin-bottom: 0;
+}
+
+.telemetry-item span:first-child {
+    width: 180px;
+    color: var(--text);
+    font-size: 0.9rem;
+}
+
+.telemetry-bar {
+    flex: 1;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.telemetry-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-dark), var(--primary-green));
+    transition: width 0.5s ease;
+}
+
+#signal-strength {
+    background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+}
+
+#noise-level {
+    background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+}
+
+#scan-speed {
+    background: linear-gradient(90deg, var(--primary-dark), var(--cyan));
+}
+
+.telemetry-item span:last-child {
+    width: 80px;
+    text-align: right;
+    color: var(--cyan);
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+}
+
+/* ========== ПАНЕЛЬ САМОУНИЧТОЖЕНИЯ ========== */
+.destruction-panel {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #220000 0%, #000 100%);
+    border: 3px solid var(--red);
+    border-radius: 8px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.destruction-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 0, 0, 0.1) 10px,
+        rgba(255, 0, 0, 0.1) 20px
+    );
+    pointer-events: none;
+}
+
+.destruction-warning-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(255, 0, 0, 0.2);
+    border: 1px solid var(--red);
+    border-radius: 4px;
+    animation: blink 1s infinite;
+}
+
+.destruction-warning-text i {
+    font-size: 2rem;
+    color: var(--red);
+}
+
+.destruction-warning-text span {
+    color: var(--red);
+    font-weight: bold;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px var(--red);
+}
+
+.destruction-btn {
+    width: 100%;
+    padding: 25px;
+    background: linear-gradient(135deg, #ff0000 0%, #990000 100%);
+    border: 3px solid var(--red);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.destruction-btn:hover {
+    background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+    box-shadow: 0 0 30px var(--red);
+    transform: scale(1.02);
+}
+
+.destruction-btn:active {
+    transform: scale(0.98);
+}
+
+.destruction-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+}
+
+.destruction-timer {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--yellow);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.destruction-timer span:first-child {
+    color: var(--yellow);
+    font-weight: bold;
+}
+
+.destruction-timer .timer {
+    color: var(--yellow);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    animation: blink 2s infinite;
+}
+
+/* ========== ЭКСТРЕННАЯ КНОПКА В ШАПКЕ ========== */
+.emergency-btn {
+    background: linear-gradient(135deg, #ff9900 0%, #cc6600 100%);
+    border: 2px solid var(--orange);
+    color: black;
+    padding: 8px 15px;
+    border-radius: 4px;
     font-weight: bold;
     cursor: pointer;
-    box-shadow: var(--glow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: var(--animation-fast);
+    white-space: nowrap;
 }
 
-.mobile-menu-btn.active {
-    background: var(--primary-green);
-    color: #000;
+.emergency-btn:hover {
+    background: linear-gradient(135deg, #ffaa00 0%, #dd7700 100%);
+    box-shadow: 0 0 15px var(--orange);
 }
 
-.close-sidebar {
-    display: none;
-    position: absolute;
-    top: var(--space-md);
-    right: var(--space-md);
-    background: none;
-    border: none;
+/* ========== БЫСТРЫЕ ДЕЙСТВИЯ ========== */
+.action-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.action-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
     color: var(--text);
-    font-size: 1.5rem;
+    padding: 15px 10px;
+    border-radius: 4px;
     cursor: pointer;
-    z-index: 1001;
+    transition: var(--animation-fast);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
 }
 
-/* Классы для управления видимостью */
-.visible-mobile {
-    display: none;
+.action-btn:hover {
+    background: var(--surface-light);
+    box-shadow: 0 0 10px var(--primary-green);
 }
 
-.visible-tablet {
-    display: none;
+.action-btn.warning {
+    border-color: var(--orange);
 }
 
-.visible-desktop {
-    display: block;
+.action-btn.warning:hover {
+    box-shadow: 0 0 10px var(--orange);
 }
 
-.hidden-mobile {
-    display: block;
+/* ========== ИНДИКАТОРЫ В ПОДВАЛЕ ========== */
+.system-health {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 4px;
 }
 
-.hidden-tablet {
-    display: block;
+.health-indicator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
 
-.hidden-desktop {
-    display: none;
+.health-bar {
+    flex: 1;
+    height: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    overflow: hidden;
 }
 
-/* Адаптивные классы видимости */
-@media (max-width: 767px) {
-    .visible-mobile {
-        display: block !important;
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00);
+    transition: width 1s ease;
+}
+
+#health-value {
+    width: 60px;
+    text-align: right;
+    color: var(--cyan);
+    font-weight: bold;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+}
+
+.satellite-count {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.satellite-count i {
+    font-size: 2rem;
+    color: var(--cyan);
+}
+
+.count-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.count-value {
+    color: var(--cyan);
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: 'Press Start 2P', cursive;
+    line-height: 1;
+}
+
+.count-label {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.emergency-status {
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.status-dot.safe {
+    background: var(--primary-green);
+    box-shadow: 0 0 10px var(--primary-green);
+}
+
+.status-dot.warning {
+    background: var(--orange);
+    box-shadow: 0 0 10px var(--orange);
+    animation: blink 1s infinite;
+}
+
+.status-dot.danger {
+    background: var(--red);
+    box-shadow: 0 0 10px var(--red);
+    animation: blink 0.5s infinite;
+}
+
+/* ========== АДАПТИВНОСТЬ ========== */
+@media (max-width: 1200px) {
+    .radar-container {
+        flex-direction: column;
     }
     
-    .hidden-mobile {
-        display: none !important;
+    .radar-targets {
+        min-width: auto;
     }
     
-    .mobile-menu-btn {
-        display: flex;
-        align-items: center;
-        gap: var(--space-sm);
+    .tracking-controls {
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .close-sidebar {
-        display: block;
+    .action-buttons {
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
-@media (min-width: 768px) and (max-width: 1023px) {
-    .visible-tablet {
-        display: block !important;
+@media (max-width: 768px) {
+    .status-bar {
+        flex-wrap: wrap;
     }
     
-    .hidden-tablet {
-        display: none !important;
+    .emergency-btn {
+        margin-top: 10px;
+        width: 100%;
+    }
+    
+    .tracking-controls {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .map-legend {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .destruction-btn {
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 15px;
     }
 }
 
-@media (min-width: 1024px) {
-    .visible-desktop {
-        display: block !important;
+@media (max-width: 480px) {
+    .warning-modal {
+        padding: 10px;
     }
     
-    .hidden-desktop {
-        display: none !important;
+    .warning-body {
+        padding: 15px;
+    }
+    
+    .warning-footer {
+        flex-direction: column;
+    }
+    
+    .destruction-btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+    
+    .destruction-warning-text {
+        flex-direction: column;
+        text-align: center;
     }
 }
