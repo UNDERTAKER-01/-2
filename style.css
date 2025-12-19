@@ -9,37 +9,111 @@ body {
     font-family: 'Courier New', monospace;
     background-color: #000;
     color: #0f0;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(0, 40, 0, 0.5) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(0, 30, 60, 0.5) 0%, transparent 20%);
     min-height: 100vh;
-    line-height: 1.4;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Звездное поле */
+.starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.star {
+    position: absolute;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+.star.small {
+    width: 1px;
+    height: 1px;
+}
+
+.star.medium {
+    width: 2px;
+    height: 2px;
+}
+
+.star.large {
+    width: 3px;
+    height: 3px;
+}
+
+.star.twinkling {
+    animation: twinkle 3s infinite alternate;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 10px;
+    position: relative;
+    z-index: 1;
 }
 
-/* Анимация мигания */
+/* Анимации */
 @keyframes blink {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
+    50% { opacity: 0.3; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes orbit {
+    0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(150px) rotate(-360deg); }
+}
+
+@keyframes radarSweep {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes transmission {
+    0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
 }
 
 .blink {
     animation: blink 1s infinite;
-    color: #ff0;
+    color: #0ff;
 }
 
 /* Шапка */
 header {
-    border: 3px double #0f0;
-    background-color: #001100;
+    border: 4px double #0f0;
+    background: linear-gradient(to bottom, #001a00, #000);
     margin-bottom: 15px;
     padding: 10px;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    position: relative;
+    z-index: 2;
 }
 
 .header-content {
@@ -51,49 +125,53 @@ header {
 }
 
 .logo {
-    width: 60px;
-    height: 60px;
-    filter: hue-rotate(90deg) brightness(1.2);
+    width: 70px;
+    height: 70px;
+    filter: hue-rotate(90deg) brightness(1.5) drop-shadow(0 0 5px #0ff);
+    animation: rotate 20s linear infinite;
 }
 
 h1 {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
+    font-size: 2rem;
     text-align: center;
     color: #0ff;
-    text-shadow: 0 0 5px #0ff;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
     margin: 0 15px;
     flex-grow: 1;
+    letter-spacing: 2px;
 }
 
 .status-bar {
     background-color: #000;
-    border: 1px solid #0f0;
-    padding: 8px 15px;
+    border: 2px solid #0f0;
+    padding: 10px 20px;
     font-size: 0.9rem;
     display: flex;
-    gap: 15px;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-.online {
+.mode {
+    color: #ff0;
+    font-weight: bold;
+    text-shadow: 0 0 5px #ff0;
+}
+
+.system-status {
     color: #0f0;
     font-weight: bold;
     text-shadow: 0 0 5px #0f0;
 }
 
-.system-status {
-    color: #ff0;
-    font-weight: bold;
-}
-
-#clock {
+#coordinates {
     color: #0ff;
     font-family: 'Press Start 2P', cursive;
     font-size: 0.8rem;
 }
 
 .marquee {
-    background-color: #002200;
+    background: linear-gradient(to right, #002200, #004400, #002200);
     border: 1px solid #0a0;
     padding: 5px;
     overflow: hidden;
@@ -101,212 +179,245 @@ h1 {
 
 marquee {
     color: #ff0;
-    font-size: 0.9rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-shadow: 0 0 3px #ff0;
 }
 
 /* Основное содержимое */
 .main-content {
     display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
+    gap: 20px;
+    margin-bottom: 20px;
 }
 
 .sidebar {
     flex: 1;
-    min-width: 250px;
+    min-width: 300px;
 }
 
 .content {
     flex: 3;
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 20px;
 }
 
 /* Панели */
 .panel {
-    background-color: #001a00;
+    background: linear-gradient(to bottom, #001a00, #000);
     border: 2px solid #0a0;
-    margin-bottom: 15px;
-    padding: 15px;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    position: relative;
 }
 
 .panel h2 {
     font-family: 'Orbitron', sans-serif;
     color: #0ff;
-    border-bottom: 1px dashed #0a0;
-    padding-bottom: 8px;
-    margin-bottom: 15px;
-    font-size: 1.2rem;
+    border-bottom: 2px solid #0a0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
 .main-panel {
-    min-height: 300px;
+    min-height: 400px;
 }
 
-/* Меню */
-.menu {
-    list-style: none;
-}
-
-.menu li {
-    padding: 10px;
-    margin-bottom: 8px;
-    background-color: #003300;
-    border-left: 4px solid #0a0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s;
-}
-
-.menu li:hover {
-    background-color: #005500;
-    border-left-color: #0f0;
-}
-
-.menu li.active {
-    background-color: #007700;
-    border-left-color: #0f0;
-    color: #ff0;
-    font-weight: bold;
-}
-
-/* Индикаторы статуса */
-.status-indicators {
-    margin-bottom: 15px;
-}
-
-.status-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dotted #0a0;
-}
-
-.indicator {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: #333;
-    display: inline-block;
-}
-
-.indicator.active {
-    background-color: #0f0;
-    box-shadow: 0 0 8px #0f0;
-}
-
-.indicator.warning {
-    background-color: #ff0;
-    box-shadow: 0 0 8px #ff0;
-    animation: blink 1s infinite;
-}
-
-.system-info {
-    background-color: #000;
-    border: 1px solid #0a0;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-.system-info p {
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Оповещения */
-.alert-list {
+/* Элементы управления галактикой */
+.galaxy-controls {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 15px;
 }
 
-.alert {
-    padding: 10px;
-    border-left: 5px solid;
-    background-color: #001100;
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-.alert.low {
-    border-left-color: #ff0;
+.control-group label {
+    color: #0ff;
+    font-weight: bold;
+    font-size: 0.9rem;
 }
 
-.alert.medium {
-    border-left-color: #ff9900;
+select, input[type="text"] {
+    background-color: #000;
+    color: #0f0;
+    border: 1px solid #0a0;
+    padding: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
 }
 
-.alert.high {
-    border-left-color: #f00;
-    animation: blink 2s infinite;
+select:focus, input[type="text"]:focus {
+    outline: none;
+    border-color: #0ff;
+    box-shadow: 0 0 10px #0ff;
 }
 
-/* Карта орбит */
+.warp-controls {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.warp-btn {
+    background-color: #003300;
+    color: #0f0;
+    border: 1px solid #0a0;
+    padding: 8px 12px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    flex: 1;
+}
+
+.warp-btn:hover {
+    background-color: #005500;
+}
+
+.warp-btn.active {
+    background-color: #00aa00;
+    color: #000;
+    box-shadow: 0 0 10px #0f0;
+}
+
+/* Карта галактики */
 .map-container {
     position: relative;
-    height: 250px;
+    height: 350px;
     background-color: #000511;
-    border: 1px solid #0a0;
+    border: 2px solid #0a0;
     margin-bottom: 15px;
     overflow: hidden;
 }
 
+.galaxy-map {
+    position: relative;
+    width: 2000px;
+    height: 2000px;
+    transform-origin: center;
+    transition: transform 0.5s ease;
+}
+
+/* Планеты */
+.planet {
+    position: absolute;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.planet:hover {
+    transform: scale(1.2);
+}
+
 .earth {
+    top: 45%;
+    left: 45%;
+    z-index: 10;
+}
+
+.planet-icon {
+    color: #0ff;
+    font-size: 2.5rem;
+    text-shadow: 0 0 15px #0ff;
+    animation: float 5s infinite ease-in-out;
+}
+
+.planet-ring {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100px;
-    height: 100px;
+    border: 2px dashed #0a0;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #0a0a5a, #000822);
-    box-shadow: 0 0 30px rgba(0, 100, 255, 0.5);
+    width: 80px;
+    height: 80px;
+    animation: rotate 30s linear infinite;
 }
 
-.orbit, .orbit2 {
+.jupiter-ring {
+    width: 120px;
+    height: 120px;
+    border-color: #ff9900;
+}
+
+.moon {
+    top: 30%;
+    left: 60%;
+}
+
+.mars {
+    top: 20%;
+    left: 20%;
+}
+
+.jupiter {
+    top: 70%;
+    left: 70%;
+}
+
+/* Поле астероидов */
+.asteroid-field {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    border: 1px dashed #0a0;
-    border-radius: 50%;
-}
-
-.orbit {
-    width: 200px;
-    height: 200px;
-}
-
-.orbit2 {
+    top: 10%;
+    left: 80%;
     width: 300px;
     height: 300px;
+    background-image: 
+        radial-gradient(circle at 10% 20%, transparent 20%, rgba(255, 255, 0, 0.1) 21%),
+        radial-gradient(circle at 30% 40%, transparent 20%, rgba(255, 255, 0, 0.1) 21%),
+        radial-gradient(circle at 50% 60%, transparent 20%, rgba(255, 255, 0, 0.1) 21%),
+        radial-gradient(circle at 70% 80%, transparent 20%, rgba(255, 255, 0, 0.1) 21%);
+    animation: rotate 100s linear infinite;
 }
 
-.satellite {
+/* Спутники на карте */
+.satellite-map {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
+    z-index: 5;
+    transition: all 0.3s;
+}
+
+.satellite-map:hover {
+    transform: scale(1.5);
+}
+
+.satellite-map.active {
+    animation: pulse 1s infinite;
 }
 
 .satellite-icon {
     color: #0ff;
-    font-size: 1.5rem;
-    text-shadow: 0 0 8px #0ff;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px #0ff;
     animation: float 3s infinite ease-in-out;
 }
 
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+.satellite-icon.warning {
+    color: #ff0;
+    text-shadow: 0 0 10px #ff0;
 }
 
+.satellite-icon.critical {
+    color: #f00;
+    text-shadow: 0 0 10px #f00;
+    animation: blink 0.5s infinite;
+}
+
+/* Управление картой */
 .map-controls {
     display: flex;
     justify-content: center;
@@ -314,16 +425,18 @@ marquee {
     flex-wrap: wrap;
 }
 
-/* Кнопки */
 .btn {
     background-color: #003300;
     color: #0f0;
     border: 1px solid #0a0;
-    padding: 8px 15px;
+    padding: 10px 15px;
     font-family: 'Courier New', monospace;
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn:hover {
@@ -331,151 +444,407 @@ marquee {
     box-shadow: 0 0 10px #0f0;
 }
 
-/* Таблица */
-.satellite-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
+/* Сетка спутников */
+.data-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #0a0;
+    padding-bottom: 5px;
 }
 
-.satellite-table th {
+.tab {
+    padding: 8px 15px;
     background-color: #002200;
-    color: #0ff;
-    padding: 10px;
-    text-align: left;
     border: 1px solid #0a0;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-.satellite-table td {
-    padding: 10px;
-    border: 1px solid #0a0;
+.tab:hover {
+    background-color: #004400;
 }
 
-.satellite-table tr:nth-child(even) {
-    background-color: #001100;
-}
-
-.satellite-table tr:hover {
-    background-color: #003300;
-}
-
-.status-ok {
-    color: #0f0;
+.tab.active {
+    background-color: #00aa00;
+    color: #000;
     font-weight: bold;
+}
+
+.satellite-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.satellite-card {
+    background-color: #001100;
+    border: 1px solid #0a0;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.satellite-card:hover {
+    background-color: #003300;
+    border-color: #0ff;
+    transform: translateY(-5px);
+}
+
+.satellite-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.satellite-id {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.8rem;
+    color: #0ff;
+}
+
+.satellite-status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 3px;
+}
+
+.status-normal {
+    background-color: #00aa00;
+    color: #000;
 }
 
 .status-warning {
-    color: #ff0;
-    font-weight: bold;
+    background-color: #ffaa00;
+    color: #000;
 }
 
-.status-danger {
-    color: #f00;
-    font-weight: bold;
-    animation: blink 1.5s infinite;
+.status-critical {
+    background-color: #ff0000;
+    color: #fff;
+    animation: blink 1s infinite;
 }
 
-/* Сигналы */
-.signal-container {
+.satellite-name {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #0ff;
+}
+
+.satellite-meta {
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+/* Радар и телеметрия */
+.scan-container {
     display: flex;
     gap: 20px;
     flex-wrap: wrap;
 }
 
-.signal-visualizer {
-    flex: 2;
-    min-height: 100px;
-    background-color: #000;
-    border: 1px solid #0a0;
-    position: relative;
-    overflow: hidden;
+.radar {
+    flex: 1;
+    min-width: 300px;
 }
 
-.signal-visualizer::before {
+.radar-screen {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background-color: #000;
+    border: 2px solid #0a0;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.radar-screen::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: repeating-linear-gradient(
-        90deg,
-        transparent,
-        transparent 2px,
-        rgba(0, 255, 0, 0.05) 2px,
-        rgba(0, 255, 0, 0.05) 4px
-    );
+    background: 
+        radial-gradient(circle at center, transparent 50%, rgba(0, 255, 0, 0.1) 100%),
+        repeating-conic-gradient(from 0deg, transparent 0deg 15deg, rgba(0, 255, 0, 0.1) 15deg 30deg);
 }
 
-.signal-visualizer::after {
-    content: "";
+.radar-sweep {
     position: absolute;
-    top: 50%;
+    top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent 50%, rgba(0, 255, 0, 0.3) 50%);
+    border-radius: 50%;
+    animation: radarSweep 3s linear infinite;
+    transform-origin: center;
+}
+
+.radar-contact {
+    position: absolute;
+    width: 8px;
+    height: 8px;
     background-color: #0f0;
-    animation: wave 2s infinite linear;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
 }
 
-@keyframes wave {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+.radar-controls {
+    display: flex;
+    justify-content: space-between;
+    background-color: #001100;
+    padding: 10px;
+    border: 1px solid #0a0;
 }
 
-.signal-data {
+.radar-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.telemetry {
     flex: 1;
+    min-width: 300px;
+}
+
+.telemetry-data {
     background-color: #001100;
     border: 1px solid #0a0;
     padding: 15px;
+    margin-bottom: 15px;
 }
 
-.signal-item {
+.telemetry-item {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px dotted #0a0;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.telemetry-value {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.telemetry-bar {
+    width: 100px;
+    height: 10px;
+    background-color: #000;
+    border: 1px solid #0a0;
+    position: relative;
+}
+
+.telemetry-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #0f0;
+    transition: width 0.5s ease;
+}
+
+.signal-wave {
+    width: 100%;
+    height: 100px;
+    background-color: #000;
+    border: 1px solid #0a0;
+}
+
+/* Список спутников в сайдбаре */
+.satellite-filter {
+    margin-bottom: 15px;
+}
+
+.satellite-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #0a0;
+    background-color: #000;
+}
+
+.satellite-list-item {
+    padding: 10px;
+    border-bottom: 1px solid #0a0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.satellite-list-item:hover {
+    background-color: #003300;
+}
+
+.satellite-list-item.active {
+    background-color: #005500;
+    border-left: 4px solid #0ff;
+}
+
+/* Визуализация сети */
+.network-visual {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #000;
+    border: 1px solid #0a0;
+    position: relative;
+}
+
+.network-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+    background-color: #001100;
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 80px;
+}
+
+.network-node i {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.earth-node i { color: #0ff; }
+.hub-node i { color: #0f0; }
+.sat-node i { color: #ff0; }
+
+.network-line {
+    flex-grow: 1;
+    height: 2px;
+    background: linear-gradient(to right, #0ff, #0f0, #ff0);
+    position: relative;
+}
+
+.network-line::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(to right, 
+        transparent 0%, #0ff 10%, #0f0 50%, #ff0 90%, transparent 100%);
+    animation: pulse 2s infinite;
+}
+
+.network-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.stat {
+    background-color: #001100;
+    border: 1px solid #0a0;
+    padding: 10px 15px;
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    justify-content: space-between;
 }
 
 /* Подвал */
 footer {
-    border: 3px double #0f0;
-    background-color: #001100;
+    border: 4px double #0f0;
+    background: linear-gradient(to top, #001a00, #000);
     padding: 15px;
-    text-align: center;
     position: relative;
 }
 
 .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
     margin-bottom: 10px;
 }
 
-.footer-content p {
+.footer-section {
+    flex: 1;
+    min-width: 200px;
+}
+
+.footer-section p {
     margin-bottom: 5px;
     color: #0a0;
+    font-size: 0.9rem;
+}
+
+.system-metrics {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.metric {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #001100;
+    padding: 8px 12px;
+    border: 1px solid #0a0;
+}
+
+.metric i {
+    color: #0ff;
 }
 
 .visitor-counter {
-    display: inline-block;
-    background-color: #000;
-    border: 1px solid #0a0;
-    padding: 5px 15px;
-    margin-top: 10px;
-    color: #ff0;
-}
-
-.construction {
-    position: absolute;
-    top: -20px;
-    right: 20px;
-    background-color: #ff0;
-    color: #000;
-    padding: 5px 10px;
-    font-weight: bold;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
-    border: 2px solid #000;
+    background-color: #000;
+    border: 1px solid #0a0;
+    padding: 10px 15px;
+    color: #ff0;
+    font-weight: bold;
+}
+
+.counter-separator {
+    color: #0a0;
+}
+
+.transmission {
+    text-align: center;
+    padding-top: 10px;
+    border-top: 1px dashed #0a0;
+}
+
+.transmission-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #002200;
+    padding: 10px 20px;
+    border: 1px solid #0f0;
+    position: relative;
+}
+
+.transmission-pulse {
+    width: 10px;
+    height: 10px;
+    background-color: #0f0;
+    border-radius: 50%;
+    animation: transmission 2s infinite;
 }
 
 /* Всплывающее окно */
@@ -486,61 +855,123 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     z-index: 1000;
     justify-content: center;
     align-items: center;
 }
 
 .popup-content {
-    background-color: #001a00;
+    background: linear-gradient(to bottom, #001a00, #000);
     border: 3px solid #0ff;
-    padding: 20px;
+    padding: 25px;
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 0 30px #0ff;
+    max-width: 700px;
+    box-shadow: 0 0 40px #0ff;
+    max-height: 80vh;
+    overflow-y: auto;
 }
 
 .popup-content h3 {
     color: #0ff;
-    border-bottom: 1px dashed #0ff;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
+    border-bottom: 2px solid #0ff;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
     font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.popup-body p {
+.popup-body {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.popup-section {
+    background-color: #001100;
+    border: 1px solid #0a0;
+    padding: 15px;
+}
+
+.popup-section h4 {
+    color: #0ff;
     margin-bottom: 10px;
-    padding: 5px;
-    background-color: #000;
-    border-left: 3px solid #0a0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
 }
 
-.close-btn {
-    margin-top: 15px;
-    width: 100%;
+.popup-section p {
+    margin-bottom: 8px;
+    padding-left: 10px;
+    border-left: 2px solid #0a0;
+}
+
+.popup-footer {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.btn-track {
+    background-color: #005500;
+}
+
+.btn-track:hover {
+    background-color: #00aa00;
+}
+
+/* Полосы прокрутки */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #001100;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #00aa00;
+    border: 1px solid #0a0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00ff00;
 }
 
 /* Адаптивность */
-@media (max-width: 900px) {
+@media (max-width: 1200px) {
     .main-content {
         flex-direction: column;
     }
     
+    .sidebar {
+        min-width: 100%;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
     .header-content {
         flex-direction: column;
         gap: 15px;
     }
     
-    h1 {
-        font-size: 1.4rem;
-    }
-}
-
-@media (max-width: 600px) {
     .status-bar {
         flex-direction: column;
-        gap: 5px;
+        gap: 10px;
+    }
+    
+    .scan-container {
+        flex-direction: column;
     }
     
     .map-controls {
@@ -552,11 +983,8 @@ footer {
         width: 200px;
     }
     
-    .satellite-table {
-        font-size: 0.8rem;
-    }
-    
-    h1 {
-        font-size: 1.2rem;
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
     }
 }
