@@ -2,387 +2,274 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>ГАЛАКТИЧЕСКИЙ СПУТНИКОВЫЙ МОНИТОРИНГ 90-х</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>СПУТНИКОВЫЙ МОНИТОРИНГ 90-х</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P|Orbitron:400,700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="starfield" id="starfield"></div>
-    
-    <!-- Предупреждение о самоуничтожении -->
-    <div class="destruction-warning" id="destruction-warning">
-        <div class="warning-modal">
-            <div class="warning-header">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h2>ПРЕДУПРЕЖДЕНИЕ О САМОУНИЧТОЖЕНИИ</h2>
-            </div>
-            <div class="warning-body">
-                <p>ВНИМАНИЕ! Активация протокола самоуничтожения приведет к:</p>
-                <ul>
-                    <li>Полному уничтожению всех спутников</li>
-                    <li>Потере всех данных мониторинга</li>
-                    <li>Невозможности восстановления системы</li>
-                    <li>Постоянному отключению мониторинга</li>
-                </ul>
-                <div class="confirmation">
-                    <label>
-                        <input type="checkbox" id="confirm-destruction">
-                        Подтверждаю понимание последствий
-                    </label>
-                </div>
-            </div>
-            <div class="warning-footer">
-                <button class="warning-btn cancel" id="cancel-destruction">ОТМЕНА</button>
-                <button class="warning-btn destroy" id="confirm-destruction-btn" disabled>ПОДТВЕРДИТЬ УНИЧТОЖЕНИЕ</button>
-            </div>
-        </div>
-    </div>
-
     <div class="container">
         <!-- Шапка сайта -->
         <header>
-            <div class="header-content">
-                <div class="logo-container">
-                    <img src="https://img.icons8.com/color/96/000000/satellite.png" alt="Спутник" class="logo">
-                    <div class="header-text">
-                        <h1><span class="blink">✦</span> ГАЛАКТИЧЕСКИЙ МОНИТОРИНГ <span class="blink">✦</span></h1>
-                        <div class="header-subtitle">СИСТЕМА ОТСЛЕЖИВАНИЯ СПУТНИКОВ v3.0</div>
-                    </div>
-                </div>
-                
-                <div class="status-bar">
-                    <div class="status-group">
-                        <span class="status-label">СОСТОЯНИЕ:</span>
-                        <span class="system-status" id="system-status">НОРМАЛЬНОЕ</span>
-                    </div>
-                    <div class="status-group">
-                        <span class="status-label">ОТСЛЕЖИВАЕТСЯ:</span>
-                        <span id="tracking-count">0</span>
-                    </div>
-                    <div class="status-group">
-                        <span class="status-label">ВРЕМЯ:</span>
-                        <span id="clock">00:00:00 UTC</span>
-                    </div>
-                    <div class="status-group">
-                        <button class="emergency-btn" id="emergency-stop">
-                            <i class="fas fa-stop-circle"></i>
-                            <span>АВАРИЙНАЯ ОСТАНОВКА</span>
-                        </button>
-                    </div>
+            <div class="header-top">
+                <img src="https://img.icons8.com/color/96/000000/satellite.png" alt="Спутник" class="logo">
+                <h1><span class="blink">●</span> СПУТНИКОВЫЙ МОНИТОРИНГ <span class="blink">●</span></h1>
+                <div class="system-time">
+                    <span id="clock">00:00:00 UTC</span>
                 </div>
             </div>
             
-            <div class="marquee-container">
-                <div class="marquee-content">
-                    ★★ СИСТЕМА ГАЛАКТИЧЕСКОГО МОНИТОРИНГА ★★ ВЕРСИЯ 3.0 ★★ 1999 ★★ АКТИВНЫХ ОБЪЕКТОВ: 47 ★★ СЕКТОР: АЛЬФА ★★ ОТСЛЕЖИВАЕТСЯ: 0 ★★
+            <div class="status-line">
+                <div class="status-item">
+                    <span class="label">СТАТУС:</span>
+                    <span class="value online">ОНЛАЙН</span>
                 </div>
+                <div class="status-item">
+                    <span class="label">СПУТНИКИ:</span>
+                    <span class="value">47/47</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">ОТСЛЕЖИВАЕТ:</span>
+                    <span class="value" id="tracking-count">12</span>
+                </div>
+                <div class="status-item">
+                    <span class="label">СИГНАЛ:</span>
+                    <span class="value signal-good">92%</span>
+                </div>
+            </div>
+            
+            <div class="marquee">
+                <marquee behavior="scroll" direction="left">
+                    ★ СИСТЕМА МОНИТОРИНГА СПУТНИКОВ ★ ВЕРСИЯ 2.1 ★ 1997 ★ АКТИВНЫХ ОБЪЕКТОВ: 47 ★ ПОСЛЕДНЕЕ ОБНОВЛЕНИЕ: 15:32 UTC ★
+                </marquee>
             </div>
         </header>
 
         <!-- Основное содержимое -->
-        <div class="main-content">
-            <!-- Боковая панель с отслеживанием -->
-            <aside class="sidebar">
-                <div class="panel tracking-panel">
-                    <h2><i class="fas fa-crosshairs"></i> ОТСЛЕЖИВАНИЕ СПУТНИКОВ</h2>
+        <div class="main-grid">
+            <!-- Левая панель -->
+            <aside class="left-panel">
+                <div class="control-panel">
+                    <h2><i class="fas fa-satellite-dish"></i> УПРАВЛЕНИЕ</h2>
                     
-                    <div class="tracking-controls">
+                    <div class="control-group">
+                        <label>РЕЖИМ СЛЕЖЕНИЯ:</label>
+                        <div class="mode-buttons">
+                            <button class="mode-btn active">АВТО</button>
+                            <button class="mode-btn">РУЧНОЙ</button>
+                            <button class="mode-btn">ЦЕЛЕВОЙ</button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>МАСШТАБ КАРТЫ:</label>
+                        <input type="range" min="1" max="5" value="3" class="zoom-slider">
+                        <div class="zoom-display">3x</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>СКОРОСТЬ ОБНОВЛЕНИЯ:</label>
+                        <div class="speed-control">
+                            <button class="speed-btn">1x</button>
+                            <button class="speed-btn active">2x</button>
+                            <button class="speed-btn">5x</button>
+                            <button class="speed-btn">MAX</button>
+                        </div>
+                    </div>
+                    
+                    <div class="track-controls">
                         <button class="track-btn" id="track-all">
-                            <i class="fas fa-bullseye"></i>
-                            <span>ОТСЛЕЖИВАТЬ ВСЕ</span>
+                            <i class="fas fa-crosshairs"></i>
+                            ОТСЛЕЖИВАТЬ ВСЕ
                         </button>
-                        <button class="track-btn" id="untrack-all">
+                        <button class="track-btn" id="clear-tracking">
                             <i class="fas fa-ban"></i>
-                            <span>ОТМЕНИТЬ ВСЕ</span>
+                            ОЧИСТИТЬ
                         </button>
-                        <button class="track-btn" id="track-important">
-                            <i class="fas fa-star"></i>
-                            <span>ВАЖНЫЕ</span>
-                        </button>
-                    </div>
-                    
-                    <div class="tracking-list-container">
-                        <div class="tracking-list-header">
-                            <span>ОТСЛЕЖИВАЕМЫЕ СПУТНИКИ (<span id="tracked-count">0</span>)</span>
-                            <button class="clear-tracked" id="clear-tracked">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                        <div class="tracking-list" id="tracking-list">
-                            <!-- Список отслеживаемых спутников -->
-                        </div>
-                    </div>
-                    
-                    <div class="tracking-stats">
-                        <div class="tracking-stat">
-                            <span>СРЕДНЯЯ ВЫСОТА:</span>
-                            <span id="avg-altitude">0 км</span>
-                        </div>
-                        <div class="tracking-stat">
-                            <span>СРЕДНЯЯ СКОРОСТЬ:</span>
-                            <span id="avg-speed">0 км/с</span>
-                        </div>
-                        <div class="tracking-stat">
-                            <span>СИГНАЛ:</span>
-                            <span id="avg-signal-quality">0%</span>
-                        </div>
                     </div>
                 </div>
                 
-                <div class="panel satellite-info-panel">
-                    <h2><i class="fas fa-info-circle"></i> ВЫБРАННЫЙ СПУТНИК</h2>
-                    <div class="selected-satellite" id="selected-satellite">
-                        <div class="no-selection">
-                            <i class="fas fa-satellite"></i>
-                            <p>Выберите спутник для просмотра информации</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="panel quick-actions">
-                    <h2><i class="fas fa-bolt"></i> БЫСТРЫЕ ДЕЙСТВИЯ</h2>
-                    <div class="action-buttons">
-                        <button class="action-btn" data-action="scan">
-                            <i class="fas fa-satellite-dish"></i>
-                            <span>СКАНИРОВАТЬ</span>
-                        </button>
-                        <button class="action-btn" data-action="diagnostics">
-                            <i class="fas fa-stethoscope"></i>
-                            <span>ДИАГНОСТИКА</span>
-                        </button>
-                        <button class="action-btn" data-action="reboot">
-                            <i class="fas fa-redo"></i>
-                            <span>ПЕРЕЗАГРУЗКА</span>
-                        </button>
-                        <button class="action-btn warning" data-action="emergency">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>АВАРИЯ</span>
-                        </button>
+                <div class="satellite-list">
+                    <h2><i class="fas fa-list"></i> СПУТНИКИ (47)</h2>
+                    <div class="list-container">
+                        <!-- Список спутников будет заполнен JS -->
                     </div>
                 </div>
             </aside>
 
-            <!-- Основной контент -->
-            <main class="content">
-                <!-- Карта галактики -->
-                <div class="panel map-panel">
-                    <div class="panel-header">
-                        <h2><i class="fas fa-map"></i> ГАЛАКТИЧЕСКАЯ КАРТА С ОТСЛЕЖИВАНИЕМ</h2>
-                        <div class="map-tools">
-                            <button class="map-tool-btn" id="show-tracking-lines">
-                                <i class="fas fa-project-diagram"></i>
-                                <span>ЛИНИИ СЛЕЖЕНИЯ</span>
-                            </button>
-                            <button class="map-tool-btn" id="show-orbits">
-                                <i class="fas fa-circle"></i>
-                                <span>ОРБИТЫ</span>
-                            </button>
-                            <button class="map-tool-btn" id="auto-center">
-                                <i class="fas fa-crosshairs"></i>
-                                <span>АВТОЦЕНТР</span>
-                            </button>
-                        </div>
+            <!-- Центральная карта -->
+            <main class="main-content">
+                <div class="map-header">
+                    <h2><i class="fas fa-map"></i> КАРТА ОРБИТ</h2>
+                    <div class="map-tools">
+                        <button class="tool-btn"><i class="fas fa-search-plus"></i></button>
+                        <button class="tool-btn"><i class="fas fa-search-minus"></i></button>
+                        <button class="tool-btn"><i class="fas fa-crosshairs"></i></button>
+                        <button class="tool-btn"><i class="fas fa-sync-alt"></i></button>
                     </div>
-                    
-                    <div class="map-container">
-                        <div class="galaxy-map" id="galaxy-map">
-                            <!-- Карта будет заполнена JavaScript -->
-                        </div>
-                        
-                        <!-- Элементы отслеживания -->
-                        <div class="tracking-overlay" id="tracking-overlay">
-                            <!-- Линии отслеживания будут рисоваться здесь -->
-                        </div>
-                        
-                        <!-- Элементы управления картой -->
-                        <div class="map-controls-overlay">
-                            <div class="map-control-group">
-                                <button class="map-control-btn" id="zoom-in">
-                                    <i class="fas fa-search-plus"></i>
-                                </button>
-                                <button class="map-control-btn" id="zoom-out">
-                                    <i class="fas fa-search-minus"></i>
-                                </button>
-                            </div>
-                            <div class="map-coordinates">
-                                <span id="coordinates">X: 0, Y: 0</span>
-                            </div>
-                        </div>
+                </div>
+                
+                <div class="galaxy-map" id="galaxy-map">
+                    <!-- Карта будет рисоваться здесь -->
+                </div>
+                
+                <div class="map-stats">
+                    <div class="stat">
+                        <span class="stat-label">ОБНАРУЖЕНО:</span>
+                        <span class="stat-value">47</span>
                     </div>
-                    
-                    <div class="map-legend">
-                        <div class="legend-item">
-                            <span class="legend-color normal"></span>
-                            <span>НОРМАЛЬНЫЙ</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color tracked"></span>
-                            <span>ОТСЛЕЖИВАЕТСЯ</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color warning"></span>
-                            <span>ПРЕДУПРЕЖДЕНИЕ</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color critical"></span>
-                            <span>КРИТИЧЕСКИЙ</span>
-                        </div>
-                        <div class="legend-item">
-                            <span class="legend-color destroyed"></span>
-                            <span>УНИЧТОЖЕН</span>
+                    <div class="stat">
+                        <span class="stat-label">ВЫСОТА:</span>
+                        <span class="stat-value">200-40,000 км</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">СКОРОСТЬ:</span>
+                        <span class="stat-value">3-8 км/с</span>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Правая панель -->
+            <aside class="right-panel">
+                <div class="selected-satellite">
+                    <h2><i class="fas fa-info-circle"></i> ВЫБРАННЫЙ СПУТНИК</h2>
+                    <div class="satellite-info" id="selected-info">
+                        <div class="no-selection">
+                            <i class="fas fa-satellite fa-3x"></i>
+                            <p>Выберите спутник для информации</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Радар внизу -->
-                <div class="panel radar-panel">
-                    <div class="panel-header">
-                        <h2><i class="fas fa-radar"></i> СИСТЕМА РАДАРНОГО СЛЕЖЕНИЯ</h2>
-                        <div class="radar-controls">
-                            <button class="radar-btn active" data-mode="auto">
-                                <i class="fas fa-play"></i>
-                                <span>АВТО</span>
-                            </button>
-                            <button class="radar-btn" data-mode="manual">
-                                <i class="fas fa-hand-pointer"></i>
-                                <span>РУЧНОЙ</span>
-                            </button>
-                            <button class="radar-btn" data-mode="scan">
-                                <i class="fas fa-sync"></i>
-                                <span>СКАН</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="radar-container">
-                        <div class="radar-display">
-                            <canvas id="radar-canvas"></canvas>
-                            <div class="radar-overlay">
-                                <div class="radar-center">
-                                    <i class="fas fa-satellite-dish"></i>
-                                </div>
-                                <div class="radar-grid">
-                                    <!-- Сетка радара -->
-                                </div>
-                                <div class="radar-sweep"></div>
-                            </div>
-                            <div class="radar-info">
-                                <div class="radar-stat">
-                                    <span>ДИАПАЗОН:</span>
-                                    <span id="radar-range">50,000 км</span>
-                                </div>
-                                <div class="radar-stat">
-                                    <span>ОБНАРУЖЕНО:</span>
-                                    <span id="radar-detected">0</span>
-                                </div>
-                                <div class="radar-stat">
-                                    <span>ТОЧНОСТЬ:</span>
-                                    <span id="radar-accuracy">98%</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="radar-targets">
-                            <h3><i class="fas fa-bullseye"></i> ЦЕЛИ РАДАРА</h3>
-                            <div class="targets-list" id="radar-targets">
-                                <!-- Список целей радара -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="radar-telemetry">
+                <div class="telemetry-panel">
+                    <h2><i class="fas fa-chart-line"></i> ТЕЛЕМЕТРИЯ</h2>
+                    <div class="telemetry-grid">
                         <div class="telemetry-item">
-                            <span>МОЩНОСТЬ СИГНАЛА:</span>
+                            <span>СИГНАЛ</span>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill" id="signal-strength"></div>
+                                <div class="telemetry-fill" style="width: 92%"></div>
                             </div>
-                            <span id="signal-value">0%</span>
+                            <span>92%</span>
                         </div>
                         <div class="telemetry-item">
-                            <span>ШУМ:</span>
+                            <span>МОЩНОСТЬ</span>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill" id="noise-level"></div>
+                                <div class="telemetry-fill" style="width: 87%"></div>
                             </div>
-                            <span id="noise-value">0%</span>
+                            <span>87%</span>
                         </div>
                         <div class="telemetry-item">
-                            <span>СКОРОСТЬ СКАНИРОВАНИЯ:</span>
+                            <span>ТЕМПЕРАТУРА</span>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill" id="scan-speed"></div>
+                                <div class="telemetry-fill" style="width: 45%"></div>
                             </div>
-                            <span id="scan-value">0 об/мин</span>
+                            <span>-65°C</span>
+                        </div>
+                        <div class="telemetry-item">
+                            <span>ДАННЫЕ</span>
+                            <div class="telemetry-bar">
+                                <div class="telemetry-fill" style="width: 78%"></div>
+                            </div>
+                            <span>1.4 Гб/с</span>
                         </div>
                     </div>
                 </div>
-            </main>
+                
+                <div class="radar-panel">
+                    <h2><i class="fas fa-radar"></i> РАДАР</h2>
+                    <div class="radar-display">
+                        <canvas id="radar-canvas"></canvas>
+                    </div>
+                    <div class="radar-info">
+                        <div class="radar-stat">
+                            <span>ДИАПАЗОН:</span>
+                            <span>50,000 км</span>
+                        </div>
+                        <div class="radar-stat">
+                            <span>ЦЕЛИ:</span>
+                            <span id="radar-targets">18</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
         </div>
 
         <!-- Панель самоуничтожения -->
         <div class="destruction-panel">
-            <div class="destruction-warning-text">
-                <i class="fas fa-skull-crossbones"></i>
-                <span>ВНИМАНИЕ: СИСТЕМА САМОУНИЧТОЖЕНИЯ АКТИВИРОВАНА</span>
+            <div class="destruction-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>ВНИМАНИЕ: СИСТЕМА САМОУНИЧТОЖЕНИЯ</span>
             </div>
             <button class="destruction-btn" id="destruction-btn">
                 <i class="fas fa-bomb"></i>
-                <span>АКТИВИРОВАТЬ ПРОТОКОЛ САМОУНИЧТОЖЕНИЯ</span>
+                <span>АКТИВИРОВАТЬ ПРОТОКОЛ</span>
             </button>
-            <div class="destruction-timer" id="destruction-timer">
-                <span>ДО АВТОМАТИЧЕСКОЙ АКТИВАЦИИ:</span>
-                <span class="timer" id="timer">--:--</span>
+            <div class="destruction-timer">
+                <span>АВТОАКТИВАЦИЯ ЧЕРЕЗ:</span>
+                <span class="timer">05:00</span>
             </div>
         </div>
 
         <!-- Подвал -->
         <footer>
             <div class="footer-content">
-                <div class="footer-section">
+                <div class="footer-left">
+                    <p>СИСТЕМА МОНИТОРИНГА СПУТНИКОВ © 1997</p>
+                    <p>ВЕРСИЯ 2.1 | ЦЕНТР КОСМИЧЕСКОГО КОНТРОЛЯ</p>
+                </div>
+                <div class="footer-center">
                     <div class="system-health">
-                        <div class="health-indicator">
-                            <span>СОСТОЯНИЕ СИСТЕМЫ:</span>
-                            <div class="health-bar">
-                                <div class="health-fill" id="system-health"></div>
-                            </div>
-                            <span id="health-value">100%</span>
+                        <span>СОСТОЯНИЕ СИСТЕМЫ:</span>
+                        <div class="health-bar">
+                            <div class="health-fill" style="width: 94%"></div>
                         </div>
+                        <span>94%</span>
                     </div>
                 </div>
-                
-                <div class="footer-section">
-                    <div class="satellite-count">
-                        <i class="fas fa-satellite"></i>
-                        <div class="count-info">
-                            <div class="count-value" id="total-satellites">47</div>
-                            <div class="count-label">АКТИВНЫХ СПУТНИКОВ</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="footer-section">
-                    <div class="emergency-status">
-                        <div class="status-indicator" id="emergency-status">
-                            <div class="status-dot safe"></div>
-                            <span>АВАРИЙНЫЙ РЕЖИМ: ОТКЛЮЧЕН</span>
-                        </div>
+                <div class="footer-right">
+                    <div class="visitor-counter">
+                        <i class="fas fa-eye"></i>
+                        <span>ПОСЕТИТЕЛИ:</span>
+                        <span id="visitor-count">004,287</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="footer-bottom">
-                <div class="copyright">
-                    © 1999 ЦЕНТР КОСМИЧЕСКОГО МОНИТОРИНГА • ПРОТОКОЛ САМОУНИЧТОЖЕНИЯ ЗАБЛОКИРОВАН
-                </div>
-                <div class="security-level">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>УРОВЕНЬ БЕЗОПАСНОСТИ: МАКСИМАЛЬНЫЙ</span>
-                </div>
+            <div class="construction">
+                <i class="fas fa-tools"></i>
+                <span>СИСТЕМА В РАЗРАБОТКЕ</span>
             </div>
         </footer>
     </div>
 
-    <!-- Скрипты -->
+    <!-- Модальное окно предупреждения -->
+    <div class="modal-overlay" id="destruction-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <i class="fas fa-skull-crossbones"></i>
+                <h3>ПРЕДУПРЕЖДЕНИЕ О САМОУНИЧТОЖЕНИИ</h3>
+            </div>
+            <div class="modal-body">
+                <p>Активация протокола самоуничтожения уничтожит:</p>
+                <ul>
+                    <li>Все 47 спутников</li>
+                    <li>Базу данных мониторинга</li>
+                    <li>Архивные записи</li>
+                </ul>
+                <div class="confirmation">
+                    <label>
+                        <input type="checkbox" id="confirm-box">
+                        Подтверждаю понимание последствий
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" id="cancel-btn">ОТМЕНА</button>
+                <button class="modal-btn destroy" id="confirm-btn" disabled>ПОДТВЕРДИТЬ УНИЧТОЖЕНИЕ</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
