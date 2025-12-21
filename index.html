@@ -7,13 +7,14 @@
   <link rel="stylesheet" href="style.css">
   <!-- PDF Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Шрифты -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="scanline"></div>
   
   <!-- Комикс-панели -->
   <div class="comic-container" id="comic">
-    <!-- Панель 1: Вступление -->
     <div class="comic-slide active" data-step="1">
       <div class="slide-title">25 ДЕКАБРЯ 1991 · 23:47 · КАЛИНИНГРАД</div>
       <div class="ascii-art">
@@ -35,7 +36,6 @@
       </div>
     </div>
 
-    <!-- Панель 2: Утечка -->
     <div class="comic-slide" data-step="2">
       <div class="slide-title">ФАЙЛ: BURAN4_LEAK.ZIP</div>
       <div class="ascii-art">
@@ -57,7 +57,6 @@
       </div>
     </div>
 
-    <!-- Панель 3: Подключение -->
     <div class="comic-slide" data-step="3">
       <div class="slide-title">МОДЕМ: 2400 БОД · ПОДКЛЮЧЕНИЕ...</div>
       <div class="ascii-art">
@@ -76,10 +75,9 @@
       </div>
     </div>
 
-    <!-- Панель 4: Система -->
     <div class="comic-slide" data-step="4">
       <div class="slide-title">ТЕРМИНАЛ „ЗЕНИТ-7“ · УРОВЕНЬ ДОСТУПА: ГОСТЬ</div>
-      <div class="ascii-art" id="terminal-screenshot">
+      <div class="ascii-art">
         ┌──────────────────────────────────────┐
         │ СИСТЕМА: СПУТНИКОВЫЙ МОНИТОРИНГ     │
         │ ОБЪЕКТ: БУРАН-4 (ОРБИТАЛЬНЫЙ КОМПЛЕКС)│
@@ -97,7 +95,6 @@
       </div>
     </div>
 
-    <!-- Панель 5: Хоррор -->
     <div class="comic-slide" data-step="5">
       <div class="slide-title"><span class="glitch" data-text="СИСТЕМА ЗАРАЖЕНА">СИСТЕМА ЗАРАЖЕНА</span></div>
       <div class="ascii-art">
@@ -121,14 +118,14 @@
   <!-- Терминал -->
   <div class="terminal" id="terminal">
     <div class="terminal-log system-log">[СИСТЕМА] Добро пожаловать в сеть "Зенит-7". Уровень доступа: ГОСТЬ</div>
-    <div class="terminal-log">[ИНФО] Команды: help, chat, connect, scan, decrypt, xor_key, override, passport, exit</div>
+    <div class="terminal-log">[ИНФО] Команды: help, chat, scan, decrypt, xor_key, override, report, exit</div>
     <div class="input-line">
       <span class="prompt">zenit7@electron:~$ </span>
       <input type="text" id="terminal-input" autofocus>
     </div>
   </div>
 
-  <!-- Полноэкранный чат с хакером -->
+  <!-- Полноэкранный чат -->
   <div id="chat-screen" class="chat-hidden">
     <div class="chat-header">
       [ SECURE IRC // CHANNEL #UNDERGROUND — ENCRYPTION: AES-256 ]
@@ -136,7 +133,6 @@
     <div class="chat-log" id="chat-log">
       <div class="chat-msg system">● Connection established. Protocol: SSL + OTP</div>
       <div class="chat-msg them">CIA_Source has joined #underground</div>
-      <div class="chat-msg them">CIA_Source: кто купит координаты секретного объекта?</div>
     </div>
     <div class="chat-input">
       <span class="chat-prompt">&gt; </span>
