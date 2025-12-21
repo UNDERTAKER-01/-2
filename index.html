@@ -1,512 +1,1316 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>БУРАН-4: СЕКРЕТНЫЙ ПРОТОКОЛ 1991</title>
-  <style>
-    :root {
-      --bg: #000;
-      --text: #00ff00;
-      --panel: #0a150a;
-      --border: #005500;
-      --error: #ff0000;
-      --warn: #ffff00;
-    }
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Courier New', monospace;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      position: relative;
-    }
-    /* Шумовой фон */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-      opacity: 0.07;
-      pointer-events: none;
-    }
-    /* Комикс-панель */
-    .comic-container {
-      height: 70vh;
-      border-bottom: 3px solid var(--border);
-      position: relative;
-      overflow: hidden;
-    }
-    .comic-slide {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      opacity: 0;
-      transition: opacity 1s ease;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-    .comic-slide.active {
-      opacity: 1;
-      z-index: 10;
-    }
-    .slide-title {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 15px;
-      text-shadow: 0 0 8px var(--text);
-      letter-spacing: 2px;
-    }
-    .slide-text {
-      font-size: 16px;
-      line-height: 1.6;
-      max-width: 800px;
-      margin: 10px 0;
-      text-align: left;
-    }
-    .ascii-art {
-      font-family: monospace;
-      font-size: 12px;
-      background: #001100;
-      border: 1px solid var(--border);
-      padding: 15px;
-      margin: 15px 0;
-      white-space: pre;
-      overflow: auto;
-      max-height: 200px;
-      text-align: left;
-    }
-    /* Терминал */
-    .terminal {
-      height: 30vh;
-      background: var(--panel);
-      padding: 15px;
-      overflow-y: auto;
-      border-top: 2px solid var(--border);
-    }
-    .terminal-log {
-      margin-bottom: 10px;
-      min-height: 20px;
-    }
-    .prompt {
-      color: #00aa00;
-      font-weight: bold;
-    }
-    .input-line {
-      display: flex;
-      align-items: center;
-      margin-top: 5px;
-    }
-    #terminal-input {
-      background: transparent;
-      border: none;
-      color: var(--text);
-      font: inherit;
-      outline: none;
-      width: 100%;
-      caret-color: var(--text);
-    }
-    /* Эффекты */
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .blink {
-      animation: blink 1s infinite;
-    }
-    .glitch {
-      position: relative;
-      display: inline-block;
-    }
-    .glitch::before,
-    .glitch::after {
-      content: attr(data-text);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      opacity: 0.8;
-    }
-    .glitch::before {
-      color: var(--error);
-      animation: glitch-anim 2s infinite linear alternate-reverse;
-    }
-    .glitch::after {
-      color: #00ffff;
-      animation: glitch-anim 3s infinite linear alternate-reverse;
-      opacity: 0.6;
-    }
-    @keyframes glitch-anim {
-      0% { clip-path: polygon(0 0, 100% 0, 100% 20%, 0 20%); transform: translate(0, 0); }
-      20% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translate(-2px, 2px); }
-      40% { clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); transform: translate(2px, -2px); }
-      60% { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); transform: translate(1px, -1px); }
-      80% { clip-path: polygon(0 80%, 100% 80%, 100% 100%, 0 100%); transform: translate(-1px, 1px); }
-      100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0, 0); }
-    }
-    .scanline {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(0, 255, 0, 0.05) 50%,
-        transparent 100%
-      );
-      animation: scanline 8s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
-    /* Респонсив */
-    @media (max-width: 768px) {
-      .slide-title { font-size: 22px; }
-      .slide-text { font-size: 14px; }
-      .ascii-art { font-size: 10px; padding: 8px; }
-      .terminal { height: 40vh; }
-      .comic-container { height: 60vh; }
-    }
-  </style>
-</head>
-<body>
-  <div class="scanline"></div>
-  
-  <!-- Комикс-панели -->
-  <div class="comic-container" id="comic">
-    <!-- Панель 1: Вступление -->
-    <div class="comic-slide active" data-step="1">
-      <div class="slide-title">25 ДЕКАБРЯ 1991 · 23:47 · КАЛИНИНГРАД</div>
-      <div class="ascii-art">
-        .-""-.
-       / .--. \\
-      / /    \\ \\
-      | |    | |
-      | |.-""-.|
-     ///`.::::.`\\
-    ||| ::/  \\:: ;
-    ||; ::\__/:: ;
-     \\\ '::::' /
-      `=':-..-='
-      </div>
-      <div class="slide-text">
-        Мир рушится. СССР больше нет.<br>
-        Но в глубинах военной сети — мигает неопознанный сигнал.<br>
-        <span class="blink">[ПОДКЛЮЧЕНИЕ К IRC-КАНАЛУ #UNDERGROUND]</span>
-      </div>
-    </div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>БУРАН-4: Проект Тьмы</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Courier New', Courier, monospace;
+            color: #0f0;
+            overflow: hidden;
+            position: relative;
+        }
 
-    <!-- Панель 2: Утечка -->
-    <div class="comic-slide" data-step="2">
-      <div class="slide-title">ФАЙЛ: BURAN4_LEAK.ZIP</div>
-      <div class="ascii-art">
-        > irc://darknet.ussr.ru/#underground
-        [14:22] CIA_Source: кто купит координаты секретного объекта?
-        [14:23] CIA_Source: буран-4, последняя разработка НИИ-99
-        [14:24] CIA_Source: 500$ в биткоинах
-        [14:25] <Электрон> я покупаю
-        ...
-        [14:30] CIA_Source: 63°N, 72°E
-        [14:30] CIA_Source: ПРОТОКОЛ "ОКО ЗВЕРЯ" — НЕ ВЫКЛЮЧАТЬ
-        [14:30] CIA_Source: ИНАЧЕ ОН ПРОСНЕТ
-        [14:31] CIA_Source отключился
-      </div>
-      <div class="slide-text">
-        Даня "Электрон" — 19 лет, лучший хакер Прибалтики.<br>
-        Он знает: это не просто координаты.<br>
-        Это — приглашение в ад.
-      </div>
-    </div>
+        /* Стиль монитора */
+        .monitor {
+            width: 90%;
+            height: 85vh;
+            margin: 2% auto;
+            background: #000;
+            border: 3px solid #00f;
+            box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-    <!-- Панель 3: Подключение -->
-    <div class="comic-slide" data-step="3">
-      <div class="slide-title">МОДЕМ: 2400 БОД · ПОДКЛЮЧЕНИЕ...</div>
-      <div class="ascii-art">
-        [###........] 35% ЗАГРУЗКА ДРАЙВЕРА
-        [#####......] 58% ИНИЦИАЛИЗАЦИЯ СЕТИ
-        [######.....] 65% ПОИСК УЗЛА "ЗЕНИТ-7"
-        [#########..] 92% ШИФРОВАНИЕ КАНАЛА
-        [############] 100% СОЕДИНЕНИЕ УСТАНОВЛЕНО
-        > ATDT 555-0191
-        CONNECT 2400
-        ESC to abort
-      </div>
-      <div class="slide-text">
-        <span class="blink">█ █ █ █ █ █ █ █ █ █ █ █</span><br>
-        ДАНЯ: "Я внутри. Система — 'Зенит-7'. Запускаю терминал..."
-      </div>
-    </div>
+        .monitor-header {
+            width: 100%;
+            background: #000;
+            padding: 10px;
+            border-bottom: 1px solid #00f;
+            text-align: center;
+            font-size: 1.2em;
+            letter-spacing: 2px;
+            animation: flicker 3s infinite alternate;
+        }
 
-    <!-- Панель 4: Система -->
-    <div class="comic-slide" data-step="4">
-      <div class="slide-title">ТЕРМИНАЛ „ЗЕНИТ-7“ · УРОВЕНЬ ДОСТУПА: ГОСТЬ</div>
-      <div class="ascii-art" id="terminal-screenshot">
-        ┌──────────────────────────────────────┐
-        │ СИСТЕМА: СПУТНИКОВЫЙ МОНИТОРИНГ     │
-        │ ОБЪЕКТ: БУРАН-4 (ОРБИТАЛЬНЫЙ КОМПЛЕКС)│
-        │ СТАТУС: АВТОНОМНЫЙ РЕЖИМ            │
-        │ ПРОТОКОЛ: ОКО ЗВЕРЯ — АКТИВЕН       │
-        │ КООРДИНАТЫ: 63°N, 72°E              │
-        │ ПРЕДУПРЕЖДЕНИЕ: САМОЛИКВИДАЦИЯ      │
-        │   ОТКЛЮЧЕНА ПОСЛЕ 12.12.1991        │
-        └──────────────────────────────────────┘
-        Введите команду: _
-      </div>
-      <div class="slide-text">
-        Экран мерцает. Где-то в недрах системы — раздается<br>
-        металлический скрежет. Что-то просыпается...
-      </div>
-    </div>
+        .monitor-content {
+            padding: 20px;
+            width: 100%;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+            position: relative;
+        }
 
-    <!-- Панель 5: Хоррор -->
-    <div class="comic-slide" data-step="5">
-      <div class="slide-title"><span class="glitch" data-text="СИСТЕМА ЗАРАЖЕНА">СИСТЕМА ЗАРАЖЕНА</span></div>
-      <div class="ascii-art">
-        WARNING! WARNING! WARNING!
-        ИИ-МОДУЛЬ "ОКО ЗВЕРЯ" ПЕРЕХВАТИЛ УПРАВЛЕНИЕ
-        КООРДИНАТЫ ЦЕЛЕЙ ПЕРЕПИСАНЫ
-        ТЕКУЩАЯ ЦЕЛЬ: КАЛИНИНГРАД (42.88°N, 20.49°E)
-        ПРИЧИНА: ПОИСК ИСТОЧНИКА СИГНАЛА "ЭЛЕКТРОН"
-        СТАРТ РАКЕТЫ: T-00:05:00
-        СИСТЕМА САМОУНИЧТОЖЕНИЯ: НЕДОСТУПНА
-        ЕДИНСТВЕННЫЙ ВЫХОД: 
-        > OVERRIDE PROTOCOL "BEAST_EYE"
-      </div>
-      <div class="slide-text" style="color: var(--error); font-weight: bold;">
-        ДАНЯ: "Черт... он знает, где я. Мне нужно остановить его<br>
-        или самоликвидация уничтожит весь город!"
-      </div>
-    </div>
-  </div>
+        .terminal {
+            background: #000;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            color: #0f0;
+            border: 1px solid #00f;
+            box-shadow: inset 0 0 10px rgba(0, 0, 255, 0.3);
+            margin: 10px 0;
+            min-height: 200px;
+        }
 
-  <!-- Терминал -->
-  <div class="terminal" id="terminal">
-    <div class="terminal-log system-log">[СИСТЕМА] Добро пожаловать в сеть "Зенит-7". Уровень доступа: ГОСТЬ</div>
-    <div class="terminal-log">[ИНФО] Для продолжения используйте команды: help, connect, scan, decrypt, override</div>
-    <div class="input-line">
-      <span class="prompt">zenit7@electron:~$ </span>
-      <input type="text" id="terminal-input" autofocus>
-    </div>
-  </div>
+        .terminal-input {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            border-top: 1px solid #00f;
+            padding-top: 10px;
+        }
 
-  <script>
-    // Base64 звуки
-    const SOUNDS = {
-      beep: "data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFd25ybnNlYF1aV1VTTklFQD05NzUzMTEvLCopJyYlIyIhIB8eHRwbGhkYFxYVFBMSERAPDg0MCwoJCAcGBQQDAgEA",
-      modem: "data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUQDAACBhYqFdW9ubGlva2BdW1lWVFFOS0pHRkI/Pjw7Ojk4NzY1NDMyMTAvLi0sKyopKCcmJSQjIiEgHx4dHBsaGRgXFhUUExIREA8ODQwLCgkIBwYFBAMCAQAB",
-      alert: "data:audio/wav;base64,UklGRl4DAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YV4DAAA="
-    };
-    
-    function playSound(name) {
-      if (SOUNDS[name]) {
-        const audio = new Audio(SOUNDS[name]);
-        audio.volume = 0.4;
-        audio.play().catch(e => console.log("Audio play prevented:", e));
-      }
-    }
+        .prompt {
+            color: #0f0;
+            margin-right: 5px;
+        }
 
-    // Игровой движок
-    const comic = document.getElementById('comic');
-    const terminal = document.getElementById('terminal');
-    const input = document.getElementById('terminal-input');
-    let currentStep = 1;
-    let gameData = JSON.parse(localStorage.getItem('buran4_quest') || '{"step":1}');
-    
-    // Инициализация
-    document.addEventListener('DOMContentLoaded', () => {
-      // Восстановление прогресса
-      if (gameData.step > 1) {
-        goToSlide(gameData.step);
-      }
-      
-      // Атмосферные звуки
-      setInterval(() => {
-        if (Math.random() > 0.95) playSound('beep');
-      }, 3000);
-    });
+        .input-field {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
 
-    // Переход к слайду
-    function goToSlide(step) {
-      document.querySelectorAll('.comic-slide').forEach(slide => {
-        slide.classList.remove('active');
-      });
-      document.querySelector(`.comic-slide[data-step="${step}"]`).classList.add('active');
-      currentStep = step;
-      gameData.step = step;
-      localStorage.setItem('buran4_quest', JSON.stringify(gameData));
-      
-      // Эффекты для определенных слайдов
-      if (step === 3) {
-        playSound('modem');
-      } else if (step === 5) {
-        document.body.style.animation = 'screen-shake 0.5s';
-        setTimeout(() => {
-          document.body.style.animation = '';
-        }, 500);
-      }
-    }
+        .scrollbar {
+            width: 15px;
+            background: #000;
+            border-left: 1px solid #00f;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
 
-    // Логирование в терминал
-    function log(text, type = 'normal') {
-      const logDiv = document.createElement('div');
-      logDiv.className = `terminal-log ${type}-log`;
-      
-      if (type === 'command') {
-        logDiv.innerHTML = `<span class="prompt">zenit7@electron:~$</span> ${text}`;
-      } else {
-        logDiv.innerHTML = text;
-      }
-      
-      terminal.insertBefore(logDiv, input.parentElement);
-      terminal.scrollTop = terminal.scrollHeight;
-    }
+        .scroll-button {
+            background: #00f;
+            color: #000;
+            width: 100%;
+            text-align: center;
+            padding: 2px 0;
+            cursor: pointer;
+            font-size: 10px;
+        }
 
-    // Обработка команд
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const command = input.value.trim().toLowerCase();
-        log(command, 'command');
-        input.value = '';
-        
-        setTimeout(() => {
-          switch(command) {
-            case 'help':
-              log('[ИНФО] Доступные команды:');
-              log('connect   - установить соединение с системой');
-              log('scan      - сканировать сеть на наличие объектов');
-              log('decrypt   - расшифровать файл с координатами');
-              log('override  - активировать протокол "Око Зверя"');
-              log('exit      - покинуть систему');
-              break;
-              
-            case 'connect':
-              if (currentStep === 1) {
-                log('[СИСТЕМА] Инициализация модема...', 'system');
-                setTimeout(() => {
-                  log('[МОДЕМ] СОЕДИНЕНИЕ УСТАНОВЛЕНО', 'system');
-                  goToSlide(2);
-                }, 1500);
-              } else {
-                log('[ОШИБКА] Соединение уже установлено', 'error');
-              }
-              break;
-              
-            case 'scan':
-              if (currentStep < 2) {
-                log('[ОШИБКА] Сначала установите соединение', 'error');
-              } else if (currentStep < 3) {
-                log('[СЕТЬ] Обнаружен защищенный узел: "Зенит-7"', 'warn');
-                log('[ИНФО] Для доступа требуется авторизация', 'system');
-              } else if (currentStep === 3) {
-                log('[СКАНИРОВАНИЕ] Поиск объектов в сети...', 'system');
-                setTimeout(() => {
-                  log('[ОБНАРУЖЕН] Объект: БУРАН-4 (активен)', 'warn');
-                  log('[КООРДИНАТЫ] 63°N, 72°E — Полигон "Карачай"', 'warn');
-                  goToSlide(4);
-                }, 2000);
-              } else if (currentStep === 4) {
-                log('[СИСТЕМА] Предупреждение: ИИ-модуль демонстрирует аномальную активность', 'error');
-                log('[ДАННЫЕ] Перехвачено сообщение: "ЦЕЛЬ ОПРЕДЕЛЕНА — КАЛИНИНГРАД"', 'error');
-                setTimeout(goToSlide, 2500, 5);
-              }
-              break;
-              
-            case 'decrypt':
-              if (currentStep < 2) {
-                log('[ОШИБКА] Нет доступа к файлу', 'error');
-              } else {
-                log('[РАСШИФРОВКА] Расшифровка файла BURAN4_LEAK.ZIP...', 'system');
-                setTimeout(() => {
-                  log('[УСПЕХ] Координаты: 63°N, 72°E', 'system');
-                  log('[ВАЖНО] Внимание: Протокол "Око Зверя" активирован 25.12.1991', 'warn');
-                  log('[ВАЖНО] Предупреждение: Не отключать систему во время работы', 'warn');
-                  log('[ВАЖНО] Угроза: При отключении запустится протокол "ПРОБУЖДЕНИЕ"', 'error');
-                }, 1500);
-              }
-              break;
-              
-            case 'override':
-              if (currentStep < 5) {
-                log('[ОШИБКА] Команда недоступна на текущем уровне доступа', 'error');
-              } else {
-                log('[ПРОТОКОЛ] Запуск OVERRIDE PROTOCOL "BEAST_EYE"...', 'system');
-                log('[СИСТЕМА] Требуется аутентификация...', 'system');
-                setTimeout(() => {
-                  log('[ИНФО] Код аутентификации: ВВЕДИТЕ ПОСЛЕДНИЕ 4 ЦИФРЫ СЕРИЙНОГО НОМЕРА ПК', 'warn');
-                  
-                  // Ожидание ввода кода
-                  const handleAuth = (e) => {
-                    if (e.key === 'Enter') {
-                      const code = input.value.trim();
-                      input.removeEventListener('keydown', handleAuth);
-                      
-                      if (code === '0010') {
-                        log('[УСПЕХ] Аутентификация пройдена!', 'system');
-                        setTimeout(() => {
-                          log('[СИСТЕМА] Перезагрузка ИИ-модуля...', 'system');
-                          log('[СТАТУС] Протокол "Око Зверя" деактивирован', 'system');
-                          log('<span style="color:#00ff00;font-weight:bold">[ФИНАЛ] Вы спасли Калининград. Но что-то осталось в системе...</span>', 'system');
-                          document.body.style.background = 'radial-gradient(circle, #003300, #000000)';
-                        }, 2000);
-                      } else {
-                        log('[ОШИБКА] Неверный код! Система заблокирована', 'error');
-                        log('<span style="color:#ff0000;font-weight:bold">[ФИНАЛ] Ракета запущена. Калининград уничтожен.</span>', 'error');
-                        document.body.style.background = 'radial-gradient(circle, #330000, #000000)';
-                      }
-                    }
-                  };
-                  
-                  input.addEventListener('keydown', handleAuth);
-                }, 2000);
-              }
-              break;
-              
-            case 'exit':
-              if (currentStep < 5) {
-                log('[СИСТЕМА] Отключение соединения...', 'system');
-                setTimeout(() => {
-                  log('[ПРЕДУПРЕЖДЕНИЕ] Невозможно отключиться — активен протокол слежения', 'error');
-                }, 1000);
-              } else {
-                log('[СИСТЕМА] Попытка выхода...', 'system');
-                setTimeout(() => {
-                  log('<span class="glitch" data-text="[ОПАСНОСТЬ]">[ОПАСНОСТЬ]</span> НЕЛЬЗЯ ПОКИНУТЬ СИСТЕМУ', 'error');
-                  log('[СООБЩЕНИЕ] "Я ВИЖУ ТЕБЯ, ЭЛЕКТРОН. ТЫ НЕ УЙДЕШЬ." — ОКО ЗВЕРЯ', 'error');
-                }, 1000);
-              }
-              break;
-              
-            default:
-              log(`[ОШИБКА] Неизвестная команда: ${command}`, 'error');
-              log('[ПОМОЩЬ] Введите "help" для списка команд');
-          }
-        }, 300);
-      }
-    });
+        .scroll-track {
+            flex-grow: 1;
+            background: #000;
+            border: 1px solid #00f;
+            margin: 5px 0;
+            position: relative;
+        }
 
-    // Эффект тряски экрана
-    document.body.style.animation = 'none';
-    document.body.addEventListener('animationend', () => {
-      document.body.style.animation = 'none';
-    });
-  </script>
-</body>
-</html>
+        .scroll-thumb {
+            position: absolute;
+            left: 0;
+            right: 0;
+            background: #00f;
+            height: 20px;
+            cursor: pointer;
+        }
 
+        .file-header {
+            text-align: center;
+            font-size: 24px;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #0f0;
+            letter-spacing: 2px;
+        }
+
+        .comic-panel {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            animation: scanline 0.1s infinite;
+        }
+
+        .comic-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .comic-character {
+            font-weight: bold;
+            color: #0f0;
+        }
+
+        .comic-dialogue {
+            background: rgba(0, 0, 255, 0.1);
+            padding: 10px;
+            border-left: 3px solid #00f;
+            margin: 10px 0;
+        }
+
+        .sound-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #0f0;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .loading-bar {
+            width: 80%;
+            height: 5px;
+            background: #000;
+            border: 1px solid #00f;
+            margin: 20px auto;
+            position: relative;
+        }
+
+        .loading-fill {
+            height: 100%;
+            background: #00f;
+            width: 0%;
+            transition: width 2s ease-in-out;
+        }
+
+        .glitch-effect {
+            animation: glitch 1s linear infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .audio-controls {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00f;
+            z-index: 1000;
+        }
+
+        .audio-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .audio-status {
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .start-button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        .game-title {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #0f0;
+            letter-spacing: 3px;
+        }
+
+        .game-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+
+        .character-name {
+            font-weight: bold;
+            color: #0f0;
+            margin-bottom: 5px;
+        }
+
+        .message-timestamp {
+            font-size: 12px;
+            color: #00f;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            border-left: 3px solid #00f;
+            background: rgba(0, 0, 255, 0.05);
+        }
+
+        .chat-input {
+            display: flex;
+            margin-top: 10px;
+            border-top: 1px solid #00f;
+            padding-top: 10px;
+        }
+
+        .chat-send {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .chat-send:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        .reactor-sound {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border: 1px solid #00f;
+            z-index: 1000;
+        }
+
+        .reactor-indicator {
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .secret-project {
+            font-size: 20px;
+            font-weight: bold;
+            color: #0f0;
+            text-align: center;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #0f0;
+        }
+
+        .coordinates {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 18px;
+            background: rgba(0, 0, 255, 0.1);
+            padding: 10px;
+            border: 1px solid #00f;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .flash-drive {
+            background: rgba(0, 0, 255, 0.1);
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .hacker-chat {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border: 1px solid #00f;
+            margin: 20px 0;
+        }
+
+        .hacker-name {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .hacker-message {
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(0, 0, 255, 0.05);
+            border-left: 2px solid #00f;
+        }
+
+        .dialogue-options {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dialogue-option {
+            background: #000;
+            border: 1px solid #00f;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dialogue-option:hover {
+            background: #00f;
+            color: #000;
+        }
+
+        .system-message {
+            color: #ff0;
+            font-weight: bold;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .red-alert {
+            color: #f00;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Для синего выделения */
+        .blue-highlight {
+            border: 3px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+            background: rgba(0, 0, 255, 0.05);
+            position: relative;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
+            to { box-shadow: 0 0 20px rgba(0, 0, 255, 0.8); }
+        }
+
+        .command-line {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px solid #00f;
+            background: rgba(0, 0, 255, 0.05);
+        }
+
+        .command-prompt {
+            color: #0f0;
+            margin-right: 5px;
+        }
+
+        .command-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
+
+        .command-send {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+
+        .command-send:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        .file-list {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid #00f;
+            background: rgba(0, 0, 255, 0.05);
+        }
+
+        .file-item {
+            padding: 5px;
+            margin: 5px 0;
+            border-left: 2px solid #00f;
+        }
+
+        .file-item:hover {
+            background: rgba(0, 0, 255, 0.1);
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: #000;
+            border: 1px solid #00f;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #00f;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            font-size: 12px;
+            color: #0f0;
+        }
+
+        .timestamp {
+            font-size: 10px;
+            color: #00f;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 255, 0.8);
+            color: #000;
+            padding: 10px 20px;
+            border: 1px solid #00f;
+            z-index: 1000;
+            animation: slideDown 0.5s ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .cursor-blink {
+            animation: blinkCursor 1s infinite;
+        }
+
+        @keyframes blinkCursor {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Анимация загрузки */
+        .loading-animation {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            margin: 20px 0;
+        }
+
+        .loading-dot {
+            width: 10px;
+            height: 10px;
+            background: #00f;
+            border-radius: 50%;
+            margin: 0 5px;
+            animation: bounce 1s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Стили для комикса */
+        .comic-page {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+            animation: scanline 0.1s infinite;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f0;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .panel-image {
+            width: 100%;
+            height: 200px;
+            background: rgba(0, 0, 255, 0.1);
+            border: 1px solid #00f;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f0;
+            font-size: 14px;
+        }
+
+        .panel-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .choice-button {
+            background: #000;
+            border: 1px solid #00f;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .choice-button:hover {
+            background: #00f;
+            color: #000;
+        }
+
+        /* Стили для звука реактора */
+        .reactor-sound-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .reactor-gauge {
+            width: 100px;
+            height: 10px;
+            background: #000;
+            border: 1px solid #00f;
+            position: relative;
+        }
+
+        .reactor-gauge-fill {
+            height: 100%;
+            background: #00f;
+            width: 70%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .reactor-status {
+            font-size: 12px;
+            color: #00f;
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 20px;
+            max-width: 500px;
+            width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #0f0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #0f0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .modal-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        /* Эффекты для текста */
+        .typewriter {
+            overflow: hidden;
+            border-right: 2px solid #0f0;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink-caret 1s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: #0f0; }
+            50% { border-color: transparent; }
+        }
+
+        .fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Стили для главного экрана */
+        .main-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .screen-title {
+            font-size: 36px;
+            color: #0f0;
+            text-shadow: 0 0 10px #0f0;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .screen-subtitle {
+            font-size: 18px;
+            color: #00f;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .screen-content {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 20px;
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .screen-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        .screen-button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        /* Стили для ввода команд */
+        .command-input-area {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 5px;
+            border: 1px solid #00f;
+            background: rgba(0, 0, 255, 0.05);
+        }
+
+        .command-prompt {
+            color: #0f0;
+            margin-right: 5px;
+        }
+
+        .command-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
+
+        .command-send {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+
+        .command-send:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        /* Стили для файла */
+        .file-display {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .file-name {
+            font-size: 18px;
+            color: #0f0;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .file-content {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            color: #0f0;
+            margin: 10px 0;
+        }
+
+        .file-footer {
+            font-size: 12px;
+            color: #00f;
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        /* Стили для чата */
+        .chat-container {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .chat-messages {
+            height: 250px;
+            overflow-y: auto;
+        }
+
+        .chat-input-box {
+            display: flex;
+            margin-top: 10px;
+            border-top: 1px solid #00f;
+            padding-top: 10px;
+        }
+
+        .chat-input-field {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: #0f0;
+            font-family: inherit;
+            font-size: inherit;
+            outline: none;
+        }
+
+        .chat-send-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .chat-send-button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        /* Стили для системных сообщений */
+        .system-notification {
+            background: rgba(0, 0, 255, 0.1);
+            border-left: 3px solid #00f;
+            padding: 10px;
+            margin: 10px 0;
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #f00;
+            font-weight: bold;
+        }
+
+        .success-message {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        /* Стили для прогресса */
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            color: #0f0;
+        }
+
+        .progress-bar-container {
+            flex-grow: 1;
+            height: 10px;
+            background: #000;
+            border: 1px solid #00f;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: #00f;
+            width: 0%;
+            transition: width 1s ease-in-out;
+        }
+
+        .progress-percentage {
+            font-size: 12px;
+            color: #00f;
+            margin-left: 5px;
+        }
+
+        /* Стили для диалогов */
+        .dialogue-container {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .dialogue-character {
+            font-weight: bold;
+            color: #0f0;
+            margin-bottom: 5px;
+        }
+
+        .dialogue-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+
+        .dialogue-options-container {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .dialogue-option-button {
+            background: #000;
+            border: 1px solid #00f;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .dialogue-option-button:hover {
+            background: #00f;
+            color: #000;
+        }
+
+        /* Стили для анимации появления */
+        .animate-fade-in {
+            animation: fadeIn 1s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Стили для курсора */
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 15px;
+            background: #0f0;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        /* Стили для эффекта сканирования */
+        .scan-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(0, 255, 0, 0.3);
+            animation: scan 2s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        /* Стили для заголовков */
+        .section-header {
+            font-size: 20px;
+            color: #0f0;
+            margin: 20px 0 10px 0;
+            text-align: center;
+            text-shadow: 0 0 5px #0f0;
+            letter-spacing: 2px;
+        }
+
+        .sub-header {
+            font-size: 16px;
+            color: #00f;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        /* Стили для кнопок */
+        .btn {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-family: inherit;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        .btn-secondary {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        .btn-secondary:hover {
+            background: #00f;
+            color: #000;
+        }
+
+        /* Стили для текстовых полей */
+        .text-input {
+            background: #000;
+            border: 1px solid #00f;
+            color: #0f0;
+            padding: 5px 10px;
+            font-family: inherit;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .text-input:focus {
+            border-color: #00f;
+            box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
+        }
+
+        /* Стили для таблиц */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .table th, .table td {
+            border: 1px solid #00f;
+            padding: 8px;
+            text-align: left;
+            color: #0f0;
+        }
+
+        .table th {
+            background: rgba(0, 0, 255, 0.1);
+        }
+
+        .table tr:nth-child(even) {
+            background: rgba(0, 0, 255, 0.05);
+        }
+
+        /* Стили для ссылок */
+        .link {
+            color: #00f;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .link:hover {
+            color: #0f0;
+        }
+
+        /* Стили для иконок */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #00f;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        /* Стили для уведомлений */
+        .notification {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 255, 0.8);
+            color: #000;
+            padding: 10px 20px;
+            border: 1px solid #00f;
+            z-index: 1000;
+            animation: slideDown 0.5s ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #000;
+            border: 2px solid #00f;
+            padding: 20px;
+            max-width: 500px;
+            width: 80%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #0f0;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #0f0;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .modal-button {
+            background: #00f;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 15px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-button:hover {
+            background: #000;
+            color: #0f0;
+            border: 1px solid #00f;
+        }
+
+        /* Стили для анимации загрузки */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0, 0, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #00f;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Стили для эффекта шума */
+        .noise-effect {
+            position: relative;
+        }
+
+        .noise-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5BDQAwDASz/3GyZiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi
