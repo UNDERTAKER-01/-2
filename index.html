@@ -1,1316 +1,421 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>БУРАН-4: Проект Тьмы</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #000;
-            font-family: 'Courier New', Courier, monospace;
-            color: #0f0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Стиль монитора */
-        .monitor {
-            width: 90%;
-            height: 85vh;
-            margin: 2% auto;
-            background: #000;
-            border: 3px solid #00f;
-            box-shadow: 0 0 20px rgba(0, 0, 255, 0.5);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .monitor-header {
-            width: 100%;
-            background: #000;
-            padding: 10px;
-            border-bottom: 1px solid #00f;
-            text-align: center;
-            font-size: 1.2em;
-            letter-spacing: 2px;
-            animation: flicker 3s infinite alternate;
-        }
-
-        .monitor-content {
-            padding: 20px;
-            width: 100%;
-            height: calc(100% - 60px);
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .terminal {
-            background: #000;
-            padding: 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
-            line-height: 1.4;
-            white-space: pre-wrap;
-            color: #0f0;
-            border: 1px solid #00f;
-            box-shadow: inset 0 0 10px rgba(0, 0, 255, 0.3);
-            margin: 10px 0;
-            min-height: 200px;
-        }
-
-        .terminal-input {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            border-top: 1px solid #00f;
-            padding-top: 10px;
-        }
-
-        .prompt {
-            color: #0f0;
-            margin-right: 5px;
-        }
-
-        .input-field {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: #0f0;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-        }
-
-        .scrollbar {
-            width: 15px;
-            background: #000;
-            border-left: 1px solid #00f;
-            position: absolute;
-            right: 0;
-            top: 0;
-            bottom: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 5px 0;
-        }
-
-        .scroll-button {
-            background: #00f;
-            color: #000;
-            width: 100%;
-            text-align: center;
-            padding: 2px 0;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        .scroll-track {
-            flex-grow: 1;
-            background: #000;
-            border: 1px solid #00f;
-            margin: 5px 0;
-            position: relative;
-        }
-
-        .scroll-thumb {
-            position: absolute;
-            left: 0;
-            right: 0;
-            background: #00f;
-            height: 20px;
-            cursor: pointer;
-        }
-
-        .file-header {
-            text-align: center;
-            font-size: 24px;
-            margin: 20px 0;
-            text-shadow: 0 0 5px #0f0;
-            letter-spacing: 2px;
-        }
-
-        .comic-panel {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-            position: relative;
-            animation: scanline 0.1s infinite;
-        }
-
-        .comic-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 10px 0;
-        }
-
-        .comic-character {
-            font-weight: bold;
-            color: #0f0;
-        }
-
-        .comic-dialogue {
-            background: rgba(0, 0, 255, 0.1);
-            padding: 10px;
-            border-left: 3px solid #00f;
-            margin: 10px 0;
-        }
-
-        .sound-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #0f0;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .loading-bar {
-            width: 80%;
-            height: 5px;
-            background: #000;
-            border: 1px solid #00f;
-            margin: 20px auto;
-            position: relative;
-        }
-
-        .loading-fill {
-            height: 100%;
-            background: #00f;
-            width: 0%;
-            transition: width 2s ease-in-out;
-        }
-
-        .glitch-effect {
-            animation: glitch 1s linear infinite;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.8; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes scanline {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100%; }
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .audio-controls {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border: 1px solid #00f;
-            z-index: 1000;
-        }
-
-        .audio-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            margin: 0 5px;
-        }
-
-        .audio-status {
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        .start-screen {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .start-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-family: inherit;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-        }
-
-        .start-button:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        .game-title {
-            font-size: 32px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px #0f0;
-            letter-spacing: 3px;
-        }
-
-        .game-subtitle {
-            font-size: 18px;
-            margin-bottom: 30px;
-            opacity: 0.8;
-        }
-
-        .character-name {
-            font-weight: bold;
-            color: #0f0;
-            margin-bottom: 5px;
-        }
-
-        .message-timestamp {
-            font-size: 12px;
-            color: #00f;
-            text-align: right;
-            margin-top: 5px;
-        }
-
-        .chat-message {
-            margin: 10px 0;
-            padding: 10px;
-            border-left: 3px solid #00f;
-            background: rgba(0, 0, 255, 0.05);
-        }
-
-        .chat-input {
-            display: flex;
-            margin-top: 10px;
-            border-top: 1px solid #00f;
-            padding-top: 10px;
-        }
-
-        .chat-send {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-
-        .chat-send:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        .reactor-sound {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px;
-            border: 1px solid #00f;
-            z-index: 1000;
-        }
-
-        .reactor-indicator {
-            width: 20px;
-            height: 20px;
-            background: red;
-            border-radius: 50%;
-            margin-right: 10px;
-            display: inline-block;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        .secret-project {
-            font-size: 20px;
-            font-weight: bold;
-            color: #0f0;
-            text-align: center;
-            margin: 20px 0;
-            text-shadow: 0 0 5px #0f0;
-        }
-
-        .coordinates {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 18px;
-            background: rgba(0, 0, 255, 0.1);
-            padding: 10px;
-            border: 1px solid #00f;
-            margin: 15px 0;
-            text-align: center;
-        }
-
-        .flash-drive {
-            background: rgba(0, 0, 255, 0.1);
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: center;
-            font-size: 18px;
-        }
-
-        .hacker-chat {
-            background: rgba(0, 0, 0, 0.5);
-            padding: 15px;
-            border: 1px solid #00f;
-            margin: 20px 0;
-        }
-
-        .hacker-name {
-            color: #0f0;
-            font-weight: bold;
-        }
-
-        .hacker-message {
-            margin: 5px 0;
-            padding: 5px;
-            background: rgba(0, 0, 255, 0.05);
-            border-left: 2px solid #00f;
-        }
-
-        .dialogue-options {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .dialogue-option {
-            background: #000;
-            border: 1px solid #00f;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .dialogue-option:hover {
-            background: #00f;
-            color: #000;
-        }
-
-        .system-message {
-            color: #ff0;
-            font-weight: bold;
-            text-align: center;
-            margin: 15px 0;
-        }
-
-        .red-alert {
-            color: #f00;
-            font-weight: bold;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-
-        /* Для синего выделения */
-        .blue-highlight {
-            border: 3px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-            background: rgba(0, 0, 255, 0.05);
-            position: relative;
-            animation: glow 2s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { box-shadow: 0 0 5px rgba(0, 0, 255, 0.5); }
-            to { box-shadow: 0 0 20px rgba(0, 0, 255, 0.8); }
-        }
-
-        .command-line {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            padding: 5px;
-            border: 1px solid #00f;
-            background: rgba(0, 0, 255, 0.05);
-        }
-
-        .command-prompt {
-            color: #0f0;
-            margin-right: 5px;
-        }
-
-        .command-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: #0f0;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-        }
-
-        .command-send {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 2px 5px;
-            cursor: pointer;
-        }
-
-        .command-send:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        .file-list {
-            margin: 15px 0;
-            padding: 10px;
-            border: 1px solid #00f;
-            background: rgba(0, 0, 255, 0.05);
-        }
-
-        .file-item {
-            padding: 5px;
-            margin: 5px 0;
-            border-left: 2px solid #00f;
-        }
-
-        .file-item:hover {
-            background: rgba(0, 0, 255, 0.1);
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 10px;
-            background: #000;
-            border: 1px solid #00f;
-            margin: 10px 0;
-            position: relative;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: #00f;
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        .progress-text {
-            position: absolute;
-            top: -20px;
-            left: 0;
-            font-size: 12px;
-            color: #0f0;
-        }
-
-        .timestamp {
-            font-size: 10px;
-            color: #00f;
-            text-align: right;
-            margin-top: 5px;
-        }
-
-        .notification {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 255, 0.8);
-            color: #000;
-            padding: 10px 20px;
-            border: 1px solid #00f;
-            z-index: 1000;
-            animation: slideDown 0.5s ease-in-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        .cursor-blink {
-            animation: blinkCursor 1s infinite;
-        }
-
-        @keyframes blinkCursor {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* Анимация загрузки */
-        .loading-animation {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-            margin: 20px 0;
-        }
-
-        .loading-dot {
-            width: 10px;
-            height: 10px;
-            background: #00f;
-            border-radius: 50%;
-            margin: 0 5px;
-            animation: bounce 1s infinite ease-in-out;
-        }
-
-        .loading-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .loading-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        /* Стили для комикса */
-        .comic-page {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .panel {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-            position: relative;
-            animation: scanline 0.1s infinite;
-        }
-
-        .panel-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: #0f0;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .panel-image {
-            width: 100%;
-            height: 200px;
-            background: rgba(0, 0, 255, 0.1);
-            border: 1px solid #00f;
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #0f0;
-            font-size: 14px;
-        }
-
-        .panel-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 10px 0;
-        }
-
-        .choice-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .choice-button {
-            background: #000;
-            border: 1px solid #00f;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .choice-button:hover {
-            background: #00f;
-            color: #000;
-        }
-
-        /* Стили для звука реактора */
-        .reactor-sound-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .reactor-gauge {
-            width: 100px;
-            height: 10px;
-            background: #000;
-            border: 1px solid #00f;
-            position: relative;
-        }
-
-        .reactor-gauge-fill {
-            height: 100%;
-            background: #00f;
-            width: 70%;
-            transition: width 0.5s ease-in-out;
-        }
-
-        .reactor-status {
-            font-size: 12px;
-            color: #00f;
-        }
-
-        /* Модальное окно */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 20px;
-            max-width: 500px;
-            width: 80%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #0f0;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            color: #0f0;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .modal-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 10px 0;
-        }
-
-        .modal-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 15px;
-            display: block;
-            width: 100%;
-            text-align: center;
-        }
-
-        .modal-button:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        /* Эффекты для текста */
-        .typewriter {
-            overflow: hidden;
-            border-right: 2px solid #0f0;
-            white-space: nowrap;
-            animation: typing 3s steps(40, end), blink-caret 1s step-end infinite;
-        }
-
-        @keyframes typing {
-            from { width: 0; }
-            to { width: 100%; }
-        }
-
-        @keyframes blink-caret {
-            from, to { border-color: #0f0; }
-            50% { border-color: transparent; }
-        }
-
-        .fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Стили для главного экрана */
-        .main-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            padding: 20px;
-        }
-
-        .screen-title {
-            font-size: 36px;
-            color: #0f0;
-            text-shadow: 0 0 10px #0f0;
-            letter-spacing: 3px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .screen-subtitle {
-            font-size: 18px;
-            color: #00f;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .screen-content {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 20px;
-            width: 80%;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .screen-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-            display: block;
-            width: 200px;
-            margin: 20px auto;
-            text-align: center;
-        }
-
-        .screen-button:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        /* Стили для ввода команд */
-        .command-input-area {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-            padding: 5px;
-            border: 1px solid #00f;
-            background: rgba(0, 0, 255, 0.05);
-        }
-
-        .command-prompt {
-            color: #0f0;
-            margin-right: 5px;
-        }
-
-        .command-input {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: #0f0;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-        }
-
-        .command-send {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 2px 5px;
-            cursor: pointer;
-        }
-
-        .command-send:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        /* Стили для файла */
-        .file-display {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-            position: relative;
-        }
-
-        .file-name {
-            font-size: 18px;
-            color: #0f0;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .file-content {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
-            line-height: 1.4;
-            white-space: pre-wrap;
-            color: #0f0;
-            margin: 10px 0;
-        }
-
-        .file-footer {
-            font-size: 12px;
-            color: #00f;
-            text-align: right;
-            margin-top: 10px;
-        }
-
-        /* Стили для чата */
-        .chat-container {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-            height: 300px;
-            overflow-y: auto;
-        }
-
-        .chat-messages {
-            height: 250px;
-            overflow-y: auto;
-        }
-
-        .chat-input-box {
-            display: flex;
-            margin-top: 10px;
-            border-top: 1px solid #00f;
-            padding-top: 10px;
-        }
-
-        .chat-input-field {
-            flex-grow: 1;
-            background: transparent;
-            border: none;
-            color: #0f0;
-            font-family: inherit;
-            font-size: inherit;
-            outline: none;
-        }
-
-        .chat-send-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-        }
-
-        .chat-send-button:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        /* Стили для системных сообщений */
-        .system-notification {
-            background: rgba(0, 0, 255, 0.1);
-            border-left: 3px solid #00f;
-            padding: 10px;
-            margin: 10px 0;
-            color: #0f0;
-            font-weight: bold;
-        }
-
-        .error-message {
-            color: #f00;
-            font-weight: bold;
-        }
-
-        .success-message {
-            color: #0f0;
-            font-weight: bold;
-        }
-
-        /* Стили для прогресса */
-        .progress-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-        }
-
-        .progress-label {
-            font-size: 14px;
-            color: #0f0;
-        }
-
-        .progress-bar-container {
-            flex-grow: 1;
-            height: 10px;
-            background: #000;
-            border: 1px solid #00f;
-            position: relative;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            background: #00f;
-            width: 0%;
-            transition: width 1s ease-in-out;
-        }
-
-        .progress-percentage {
-            font-size: 12px;
-            color: #00f;
-            margin-left: 5px;
-        }
-
-        /* Стили для диалогов */
-        .dialogue-container {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 15px;
-            margin: 15px 0;
-        }
-
-        .dialogue-character {
-            font-weight: bold;
-            color: #0f0;
-            margin-bottom: 5px;
-        }
-
-        .dialogue-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 5px 0;
-        }
-
-        .dialogue-options-container {
-            margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .dialogue-option-button {
-            background: #000;
-            border: 1px solid #00f;
-            padding: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .dialogue-option-button:hover {
-            background: #00f;
-            color: #000;
-        }
-
-        /* Стили для анимации появления */
-        .animate-fade-in {
-            animation: fadeIn 1s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Стили для курсора */
-        .terminal-cursor {
-            display: inline-block;
-            width: 10px;
-            height: 15px;
-            background: #0f0;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        /* Стили для эффекта сканирования */
-        .scan-effect {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .scan-line {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: rgba(0, 255, 0, 0.3);
-            animation: scan 2s linear infinite;
-        }
-
-        @keyframes scan {
-            0% { top: 0; }
-            100% { top: 100%; }
-        }
-
-        /* Стили для заголовков */
-        .section-header {
-            font-size: 20px;
-            color: #0f0;
-            margin: 20px 0 10px 0;
-            text-align: center;
-            text-shadow: 0 0 5px #0f0;
-            letter-spacing: 2px;
-        }
-
-        .sub-header {
-            font-size: 16px;
-            color: #00f;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        /* Стили для кнопок */
-        .btn {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            font-family: inherit;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        .btn-secondary {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        .btn-secondary:hover {
-            background: #00f;
-            color: #000;
-        }
-
-        /* Стили для текстовых полей */
-        .text-input {
-            background: #000;
-            border: 1px solid #00f;
-            color: #0f0;
-            padding: 5px 10px;
-            font-family: inherit;
-            font-size: 16px;
-            outline: none;
-        }
-
-        .text-input:focus {
-            border-color: #00f;
-            box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
-        }
-
-        /* Стили для таблиц */
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-
-        .table th, .table td {
-            border: 1px solid #00f;
-            padding: 8px;
-            text-align: left;
-            color: #0f0;
-        }
-
-        .table th {
-            background: rgba(0, 0, 255, 0.1);
-        }
-
-        .table tr:nth-child(even) {
-            background: rgba(0, 0, 255, 0.05);
-        }
-
-        /* Стили для ссылок */
-        .link {
-            color: #00f;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        .link:hover {
-            color: #0f0;
-        }
-
-        /* Стили для иконок */
-        .icon {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            background: #00f;
-            margin-right: 5px;
-            vertical-align: middle;
-        }
-
-        /* Стили для уведомлений */
-        .notification {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 255, 0.8);
-            color: #000;
-            padding: 10px 20px;
-            border: 1px solid #00f;
-            z-index: 1000;
-            animation: slideDown 0.5s ease-in-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateX(-50%) translateY(-50px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        /* Стили для модального окна */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content {
-            background: #000;
-            border: 2px solid #00f;
-            padding: 20px;
-            max-width: 500px;
-            width: 80%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #0f0;
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .modal-title {
-            font-size: 20px;
-            color: #0f0;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .modal-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin: 10px 0;
-        }
-
-        .modal-button {
-            background: #00f;
-            color: #000;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 15px;
-            display: block;
-            width: 100%;
-            text-align: center;
-        }
-
-        .modal-button:hover {
-            background: #000;
-            color: #0f0;
-            border: 1px solid #00f;
-        }
-
-        /* Стили для анимации загрузки */
-        .loading-spinner {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100px;
-            margin: 20px 0;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0, 0, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid #00f;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Стили для эффекта шума */
-        .noise-effect {
-            position: relative;
-        }
-
-        .noise-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAABnSURBVHja7M5BDQAwDASz/3GyZiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIi
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>БУРАН-4 // MONITORING TERMINAL</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: 'Share Tech Mono', monospace;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .monitor {
+      width: 90vw;
+      max-width: 800px;
+      height: 85vh;
+      background-color: #0a0a0a;
+      border: 8px solid #111;
+      box-shadow: 0 0 30px rgba(0, 80, 0, 0.6), inset 0 0 15px rgba(0, 40, 0, 0.8);
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      border-radius: 4px;
+    }
+
+    /* Эффект мерцания CRT */
+    .monitor::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(0, 30, 0, 0.05), transparent 95%);
+      pointer-events: none;
+      animation: scanline 8s linear infinite;
+    }
+
+    @keyframes scanline {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 100vh; }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      text-shadow: 0 0 8px #0f0, 0 0 16px #0a0;
+      letter-spacing: 2px;
+    }
+
+    .terminal {
+      line-height: 1.6;
+      font-size: 1.1rem;
+      white-space: pre-wrap;
+      height: calc(100% - 80px);
+      overflow-y: auto;
+      padding: 10px;
+      color: #0f0;
+      text-shadow: 0 0 3px #0a0;
+    }
+
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .input-line {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .prompt::after {
+      content: '>';
+      margin-right: 8px;
+    }
+
+    input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #0f0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.1rem;
+      outline: none;
+      text-shadow: 0 0 3px #0a0;
+    }
+
+    input::placeholder {
+      color: #080;
+    }
+
+    .timestamp {
+      color: #8f8;
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
+    /* Комикс-панель — имитация всплывающего окна */
+    .comic-panel {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 220px;
+      height: 280px;
+      background: #050;
+      border: 2px solid #0f0;
+      box-shadow: 0 0 6px #0a0;
+      padding: 10px;
+      font-size: 0.85rem;
+      display: none;
+      z-index: 10;
+    }
+
+    .comic-panel.active {
+      display: block;
+      animation: popIn 0.4s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .comic-header {
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 8px;
+      border-bottom: 1px dashed #0a0;
+      padding-bottom: 4px;
+    }
+
+    .comic-img {
+      width: 100%;
+      height: 140px;
+      background: #000 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140"><rect width="220" height="140" fill="%230a0a0a"/><circle cx="110" cy="70" r="40" fill="none" stroke="%230f0" stroke-width="2"/><text x="110" y="75" text-anchor="middle" fill="%230f0" font-size="12" font-family="monospace">[REDACTED FACE]</text></svg>') center/cover no-repeat;
+      margin-bottom: 8px;
+    }
+
+    .comic-text {
+      font-size: 0.8rem;
+      line-height: 1.5;
+    }
+
+    /* Звук реактора — индикатор */
+    .reactor-indicator {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      font-size: 0.9rem;
+      color: #8f8;
+    }
+
+    .reactor-glow {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #f00;
+      border-radius: 50%;
+      margin-right: 6px;
+      box-shadow: 0 0 6px #f00;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* Адаптив: на мобильных — убрать комикс-панель, сделать её "всплывающей по клику" */
+    @media (max-width: 600px) {
+      .comic-panel {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 90vw;
+        height: auto;
+        max-height: 80vh;
+        overflow-y: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="monitor">
+    <div class="header">
+      [ SYSTEM: BURAN-4 RECON // USSR COLLAPSE ERA — 1991.12.21 ]  
+    </div>
+
+    <div class="terminal" id="terminal"></div>
+
+    <div class="input-line">
+      <span class="prompt"></span>
+      <input type="text" id="command-input" placeholder="_" autocomplete="off" autofocus>
+    </div>
+
+    <div class="reactor-indicator">
+      <span class="reactor-glow"></span><span>REACTOR CORE // STANDBY (δ = 0.87)</span>
+    </div>
+
+    <div class="comic-panel" id="comic-panel">
+      <div class="comic-header">> INCOMING TRANSMISSION</div>
+      <div class="comic-img" id="comic-img"></div>
+      <div class="comic-text" id="comic-text"></div>
+    </div>
+  </div>
+
+  <audio id="reactor-sound" loop preload="auto">
+    <source src="https://www.soundjay.com/misc/sounds/geiger-counter-1.mp3" type="audio/mpeg">
+    <!-- Лучше заменить на низкочастотный гул реактора: https://freesound.org/people/InspectorJ/sounds/416372/ -->
+    <!-- Для демо — используем гейгер, как имитацию радиационного фона -->
+  </audio>
+
+  <script>
+    // === CONFIG ===
+    const reactorSound = document.getElementById('reactor-sound');
+    const terminal = document.getElementById('terminal');
+    const input = document.getElementById('command-input');
+    const comicPanel = document.getElementById('comic-panel');
+    const comicText = document.getElementById('comic-text');
+
+    let phase = localStorage.getItem('buran4_phase') || 'intro';
+    let messages = [];
+    let currentMessageIndex = 0;
+
+    // Запуск звука после первого взаимодействия (из-за политики браузеров)
+    document.body.addEventListener('click', () => {
+      if (reactorSound.paused) {
+        reactorSound.volume = 0.2;
+        reactorSound.play().catch(e => console.warn("Audio play failed:", e));
+      }
+    }, { once: true });
+
+    // === UTILS ===
+    function typeText(text, delay = 30, callback = null) {
+      const lines = text.split('\n');
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i < lines.length) {
+          terminal.innerHTML += `<div>${lines[i]}</div>`;
+          terminal.scrollTop = terminal.scrollHeight;
+          i++;
+        } else {
+          clearInterval(interval);
+          if (callback) callback();
+        }
+      }, delay * 10);
+    }
+
+    function timestamp() {
+      const now = new Date();
+      return `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
+    }
+
+    function log(msg, cls = '') {
+      terminal.innerHTML += `<div class="${cls}"><span class="timestamp">${timestamp()}</span> ${msg}</div>`;
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function showComic(name, text) {
+      comicText.textContent = text;
+      comicPanel.classList.add('active');
+      setTimeout(() => comicPanel.classList.remove('active'), 6000);
+    }
+
+    // === SCENES ===
+    const scenes = {
+      intro: () => {
+        typeText(`
+> SYSTEM INIT...
+> LOADING 'ELECTRON' PROFILE...
+> WELCOME, DANYA.
+> CONNECTION ESTABLISHED — ENCRYPTED CHANNEL (AES-256 / ONETIME PAD)
+
+> CONTEXT:
+  - DATE: 21 DEC 1991
+  - LOCATION: MOSCOW, USSR (STATUS: COLLAPSING)
+  - OPERATION: BURAN-4 RECON
+  - TARGET: SECRET FACILITY (COORDINATES PURCHASED VIA DARKNET)
+
+  [RECENT TRANSACTIONS]
+  > 18 DEC 1991: PAYMENT SENT (3 BTC — via anonymized mixer)
+  > 19 DEC 1991: RECEIVED PHYSICAL FLASH DRIVE (USB 1.0, ENCRYPTED)
+  > 20 DEC 1991: FLASH DRIVE INSERTED. HASH VERIFIED: 7a3f...e9c1
+
+  [FLASH CONTENTS:]
+    - MAP_FRAGMENT_01.BIN
+    - AUDIO_LOG_BURAN4_07.WAV
+    - DECRYPT_KEY_XOR.PAD
+    - _NOTE_FROM_PHANTOM.TXT
+
+> AWAITING INPUT...
+        `.trim(), 25, () => {
+          phase = 'note';
+          localStorage.setItem('buran4_phase', phase);
+          input.focus();
+        });
+      },
+
+      note: () => {
+        log("> EXECUTING: cat _NOTE_FROM_PHANTOM.TXT");
+        setTimeout(() => {
+          typeText(`
+--- BEGIN NOTE ---
+Danya,
+
+We found it. Buran-4 isn’t a shuttle. It’s a *reactor core* — self-sustaining, thorium-based, 
+prototype code-named "Zarya-9". Buried under Site-12 near Baikonur.
+
+Soviets shut it down in '89… but telemetry from KH-11 showed *heat signatures* as of last week.
+
+They lied. It’s still alive.
+
+The coordinates you bought? They’re real. But be careful — 
+the Americans didn’t "leak" them. They *planted* them. 
+This is bait. You’re walking into a trap… or a tomb.
+
+— Phantom (ex-NSA, now ghost)
+--- END NOTE ---
+
+> SYSTEM WARNING: AUDIO_LOG_BURAN4_07.WAV CONTAINS HIGH-INTENSITY ACUSTIC ANOMALY (Δf = 17.3 Hz)
+> PLAYBACK MAY INDUCE NAUSEA / VISUAL DISTORTION.
+
+> OPTIONS:
+  [1] PLAY AUDIO_LOG_BURAN4_07.WAV
+  [2] DECRYPT MAP_FRAGMENT_01.BIN
+  [3] ANALYZE DECRYPT_KEY_XOR.PAD
+  [4] IGNORE — PREPARE FOR INSERTION (COORDINATES: 45.6307° N, 63.3322° E)
+          `.trim(), 30, () => {
+            input.focus();
+          });
+        }, 800);
+      }
+    };
+
+    // === INPUT HANDLER ===
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim().toLowerCase();
+        log(`> ${cmd}`);
+        input.value = '';
+
+        if (phase === 'intro') {
+          log("ERR: SYSTEM NOT READY. WAIT FOR INIT...");
+          return;
+        }
+
+        if (phase === 'note') {
+          switch (cmd) {
+            case '1':
+            case 'play audio':
+              log("> EXECUTING: play AUDIO_LOG_BURAN4_07.WAV");
+              setTimeout(() => {
+                log("[AUD] ▶ PLAYBACK STARTED...", 'blink');
+                // Здесь можно добавить воспроизведение реального звука (низкочастотный гул + искажения)
+                showComic("Phantom", "Don't listen too long. Last guy who did — started seeing *wires in his skin*.");
+              }, 500);
+              break;
+
+            case '2':
+            case 'decrypt map':
+              log("> DECRYPTING MAP_FRAGMENT_01.BIN...");
+              setTimeout(() => {
+                log("[OK] MAP DECRYPTED. DISPLAYING COORDINATE OVERLAY.");
+                log("      [██████████████████] 100%");
+                log("      TARGET: BAikonur Perimeter — Sector Ψ (Psi)");
+                log("      WARNING: RAD LEVELS ↑ 4.7 mSv/h (NORMAL: 0.03)");
+                showComic("Danya", "This isn’t a base. It’s a *sarcophagus*… and something’s breathing inside.");
+                // → переход к следующей фазе (например, карта)
+              }, 1200);
+              break;
+
+            case '4':
+            case 'prepare':
+              log("> INITIATING INSERTION PROTOCOL...");
+              setTimeout(() => {
+                log("[SYS] PACKING: Geiger counter, NVG (Gen 1), EMP flashbang, cipher wheel.");
+                log("[GPS] LOCKED ON: 45.6307°N, 63.3322°E");
+                log("[MSG] Phantom just sent: \"If the lights go out — don’t turn them back on.\"");
+                log("\n> PRESS [ENTER] TO BEGIN INSERTION...");
+                // → переход к экрану выезда на местность (следующая страница или сцена)
+              }, 1000);
+              break;
+
+            default:
+              log(`ERR: UNKNOWN COMMAND '${cmd}'. TRY: 1, 2, 3, or 4`);
+          }
+        }
+      }
+    });
+
+    // === START ===
+    window.addEventListener('load', () => {
+      log("> BOOTING CRT MONITOR v2.1 (RETRO-91 KERNEL)");
+      setTimeout(() => {
+        scenes.intro();
+      }, 800);
+    });
+  </script>
+</body>
+</html>
