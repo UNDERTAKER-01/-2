@@ -429,3 +429,137 @@ let gameData = JSON.parse(localStorage.getItem('buran4_quest') ||
     }
   })
 );
+case 'passport':
+  log('[ГЕНЕРАЦИЯ] Создание ФИНАЛЬНОГО ОТЧЁТА ОРДО МЕХАНИКУС...', 'system');
+  
+  // Определяем уровень доверия
+  let trustLevel = "СРЕДНИЙ";
+  let trustColor = "#ffff00";
+  let warnings = [
+    "МАШИНА НЕ ОШИБАЕТСЯ",
+    "МАШИНА НЕ ПРОЩАЕТ",
+    "СИГНАЛ СЛУШАЕТ"
+  ];
+  
+  // Анализ чата
+  const msgs = gameData.chat.messages || [];
+  let trustScore = 0;
+  let suspicionScore = 0;
+  
+  msgs.forEach(m => {
+    if (m.role === 'me') {
+      if (m.text.includes('спасибо') || m.text.includes('благодар')) trustScore++;
+      if (m.text.includes('дорого') || m.text.includes('много')) suspicionScore++;
+      if (m.text.includes('кто ты') || m.text.includes('откуда')) suspicionScore++;
+    }
+  });
+
+  if (trustScore >= 2 && suspicionScore === 0) {
+    trustLevel = "ВЫСОКИЙ";
+    trustColor = "#00ff00";
+    warnings = [
+      "ОН ВЕРИТ ТЕБЕ",
+      "НО МАШИНА — ВСЕГДА СОМНЕВАЕТСЯ",
+      "НЕ ВКЛЮЧАЙ СИСТЕМУ"
+    ];
+  } else if (suspicionScore >= 2) {
+    trustLevel = "ПОДОЗРЕНИЕ";
+    trustColor = "#ff0000";
+    warnings = [
+      "ЛОВУШКА АКТИВНА",
+      "СИГНАЛ ПЕРЕДАН ТРЕТЬЕЙ СТОРОНЕ",
+      "БЕГИ. СЕЙЧАС."
+    ];
+  }
+
+  // Определяем кодовое имя
+  const codenames = ["ОКО ЗВЕРЯ", "ЗАРЯ-9", "БУРАНН-ЧЕТЫРЕ", "ПРОЕКТ Ψ"];
+  const codename = codenames[gameData.step - 1] || "НЕИЗВЕСТНО";
+
+  const script = document.createElement('script');
+  script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+  script.onload = () => {
+    passportExport.innerHTML = `
+      <div id="report" style="width:700px; padding:40px; background:#080a08; color:#ccc; font-family:'Courier New'; border:3px double #555; position:relative;">
+        <div style="text-align:center; margin-bottom:25px;">
+          <div style="font-family:'Orbitron', sans-serif; font-size:28px; color:#f33; text-shadow:0 0 8px #800;">ОРДО МЕХАНИКУС</div>
+          <div style="font-size:18px; color:#0f0; margin-top:5px;">ФИНАЛЬНЫЙ ОТЧЁТ ОПЕРАЦИИ</div>
+        </div>
+
+        <div style="margin:15px 0; padding:12px; background:#001100; border:1px solid #0a0;">
+          <div><b>КОДОВОЕ ИМЯ:</b> <span style="color:#0ff; font-weight:bold;">${codename}</span></div>
+          <div><b>ОПЕРАТИВНИК:</b> <span style="color:#afa;">ДАНЯ "ЭЛЕКТРОН" ВОЛКОВ</span></div>
+          <div><b>СТАТУС:</b> <span style="color:${trustColor}; font-weight:bold;">ДОВЕРИЕ: ${trustLevel}</span></div>
+          <div><b>САНИТИ:</b> <span style="color:#ff0;">${gameData.sanity}%</span></div>
+        </div>
+
+        <div style="margin:25px 0; text-align:center;">
+          <div style="font-size:22px; color:#0f0; margin-bottom:10px;">КООРДИНАТЫ ЦЕЛИ</div>
+          <div style="font-family:'Share Tech Mono', monospace; font-size:26px; color:#0ff; letter-spacing:3px;">
+            63.0517°N, 72.1184°E
+          </div>
+          <div style="font-size:14px; color:#888; margin-top:8px;">
+            (Полигон «Карачай», Челябинская область)
+          </div>
+        </div>
+
+        <div style="margin:20px 0;">
+          <div style="color:#f88; font-weight:bold; margin-bottom:8px;">⚠ ПРЕДУПРЕЖДЕНИЯ ⚠</div>
+          <div style="line-height:1.6; padding-left:20px;">
+            • ${warnings[0]}<br>
+            • ${warnings[1]}<br>
+            • ${warnings[2]}
+          </div>
+        </div>
+
+        <div style="margin-top:30px; padding-top:20px; border-top:1px dashed #0a0; font-size:14px; color:#888;">
+          <div>ИСТОЧНИК: CIA_Source (IRC #underground)</div>
+          <div>ВРЕМЯ ПЕРЕДАЧИ: 21 DEC 1991 23:58</div>
+          <div>ШИФР: AES-256 + OTP</div>
+        </div>
+
+        <div style="text-align:center; margin-top:40px; font-family:'Orbitron', sans-serif; color:#f55; font-size:24px;">
+          ✠ MACHINA SACRA ✠<br>
+          <span style="font-size:16px;">МАШИНА — ИСТИНА</span>
+        </div>
+
+        <!-- Печать -->
+        <div style="position:absolute; top:30px; right:30px; width:80px; height:80px; border:2px solid #f55; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; color:#f55; transform:rotate(15deg);">
+          URGENT<br>CLASSIFIED<br>Ψ
+        </div>
+      </div>
+    `;
+    
+    html2canvas(document.getElementById('report')).then(canvas => {
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Центрируем
+      const imgWidth = 180;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const x = (pageWidth - imgWidth) / 2;
+      
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, 20, imgWidth, 0);
+      pdf.save('BURAN4_FINAL_REPORT_ELECTRON.pdf');
+      
+      passportExport.innerHTML = '';
+      log('[УСПЕХ] ФИНАЛЬНЫЙ ОТЧЁТ СОХРАНЁН.', 'system');
+    });
+  };
+  document.head.appendChild(script);
+  break;
+case 'report':
+  if (gameData.chat.chosenOption) {
+    // Вызови логику из 'passport', но с пометкой "ФИНАЛЬНЫЙ ОТЧЁТ"
+    // (можно просто вызвать тот же код)
+    input.value = 'passport';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+  } else {
+    log('[ОШИБКА] Сначала получите координаты через чат', 'error');
+  }
+  break;
+// Внутри handleChatCommand, после отправки координат:
+setTimeout(() => {
+  appendChat("[СИСТЕМА] Данные получены. Сгенерировать финальный отчёт?", 'system');
+  appendChat("Команда: > report", 'system');
+}, 3000);
