@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>БУРАН-4 // TECHNICAL PASSPORT v0.4</title>
+  <title>БУРАН-4 // FINAL PHASE</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
@@ -28,6 +29,11 @@
       align-items: center;
     }
 
+    .monitor, .reactor-scene { transition: filter 0.5s ease; }
+    .monitor.sanity-2 { filter: hue-rotate(30deg) saturate(1.3); }
+    .monitor.sanity-1 { filter: hue-rotate(80deg) saturate(1.6) contrast(1.2); }
+    .monitor.sanity-0 { filter: hue-rotate(180deg) saturate(0.4) brightness(0.7); }
+
     .monitor {
       width: 94vw;
       max-width: 900px;
@@ -43,9 +49,9 @@
       padding: 20px;
       border-radius: 4px;
       font-size: 15px;
+      z-index: 10;
     }
 
-    /* CRT scanline */
     .monitor::before {
       content: '';
       position: absolute;
@@ -67,7 +73,6 @@
       font-size: 1.5rem;
       text-shadow: 0 0 6px rgba(0, 255, 0, 0.8), 0 0 12px rgba(0, 120, 0, 0.6);
       letter-spacing: 2px;
-      position: relative;
     }
 
     .terminal {
@@ -111,7 +116,7 @@
     .err { color: var(--red); }
     .warn { color: var(--amber); }
 
-    /* Чат с хакером */
+    /* Чат */
     .chat-panel {
       position: absolute;
       top: 20px; right: 20px;
@@ -123,7 +128,7 @@
       padding: 12px;
       font-size: 0.85rem;
       display: none;
-      z-index: 10;
+      z-index: 11;
       overflow-y: auto;
     }
 
@@ -140,99 +145,77 @@
       font-family: 'Orbitron', sans-serif;
     }
 
-    /* XOR Puzzle */
-    .xor-puzzle {
+    /* Reactor scene (A-Frame) — по умолчанию скрыта */
+    .reactor-scene {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 5;
       display: none;
-      margin-top: 20px;
-      text-align: center;
     }
 
-    .xor-puzzle.active { display: block; }
-    .xor-grid {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin: 15px 0;
+    .reactor-scene.active {
+      display: block;
     }
 
-    .xor-byte {
-      width: 50px; height: 50px;
-      background: #050;
+    /* Панель управления внутри реактора (поверх 3D) */
+    .in-scene-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 10, 0, 0.7);
       border: 1px solid #0a0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Orbitron';
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-family: 'Share Tech Mono';
       font-size: 1rem;
-      cursor: grab;
-      user-select: none;
+      color: var(--green);
+      z-index: 20;
+      max-width: 80vw;
     }
 
-    .xor-byte.dragging { opacity: 0.6; }
-    .xor-dropzone {
-      width: 60px; height: 60px;
-      border: 2px dashed #080;
-      margin: 5px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
+    .in-scene-input {
+      background: transparent;
+      border: none;
+      color: #afa;
+      font-family: 'Share Tech Mono';
+      font-size: 1rem;
+      outline: none;
+      width: 100%;
+      margin-top: 6px;
     }
 
-    /* Карта */
-    .map-container {
-      display: none;
-      height: 300px;
-      margin-top: 20px;
-      background: #000;
-      border: 1px solid #080;
-      position: relative;
+    /* Sanity bar */
+    .sanity-bar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+    }
+
+    .sanity-label {
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+    }
+
+    .sanity-progress {
+      height: 8px;
+      width: 120px;
+      background: #222;
+      border-radius: 4px;
       overflow: hidden;
     }
 
-    .map-container.active { display: block; }
-
-    .map-svg {
-      width: 100%; height: 100%;
-      background: #001 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23000510'/%3E%3Cpath d='M0,200 L200,180 L400,210 L600,190 L800,220' stroke='%230a0' stroke-width='2' fill='none'/%3E%3Ccircle cx='630' cy='195' r='8' fill='none' stroke='%23f33' stroke-width='2'/%3E%3Ctext x='640' y='190' fill='%23f33' font-size='12' font-family='monospace'%3EBURAN-4%3C/text%3E%3C/svg%3E") center/contain no-repeat;
+    .sanity-fill {
+      height: 100%;
+      background: linear-gradient(to right, #f33, #ff0, #0f0);
+      width: 100%;
+      transition: width 0.5s;
     }
 
-    .gps-tracker {
-      position: absolute;
-      top: 50%; left: 10%;
-      width: 12px; height: 12px;
-      background: #0f0;
-      border-radius: 50%;
-      box-shadow: 0 0 6px #0f0;
-      transform: translate(-50%, -50%);
-      transition: left 8s linear;
-    }
-
-    /* Reactor glow */
-    .reactor-glow {
-      position: absolute;
-      bottom: 15px; left: 15px;
-      display: flex;
-      align-items: center;
-      font-size: 0.9rem;
-    }
-
-    .glow-dot {
-      width: 12px; height: 12px;
-      background: #f33;
-      border-radius: 50%;
-      margin-right: 8px;
-      box-shadow: 0 0 6px #f33;
-      animation: pulse 2.2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
-    /* Passport export button */
+    /* Экспорт */
     .export-btn {
       position: absolute;
       bottom: 15px; right: 15px;
@@ -243,15 +226,9 @@
       font-family: 'Orbitron';
       font-size: 0.8rem;
       cursor: pointer;
-      transition: all 0.3s;
     }
 
-    .export-btn:hover {
-      background: #222;
-      box-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
-    }
-
-    /* PDF Passport (скрытый, для захвата) */
+    /* Passport (скрыт) */
     #passport {
       position: absolute;
       left: -9999px;
@@ -261,202 +238,209 @@
       font-family: 'Cinzel', serif;
       color: #ccc;
       border: 4px double #888;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
     }
 
-    .passport-header {
-      text-align: center;
-      font-size: 2.2rem;
-      color: #f33;
-      margin-bottom: 20px;
-      text-shadow: 0 0 8px rgba(255, 50, 50, 0.6);
-    }
-
-    .passport-field {
-      margin: 12px 0;
-      font-size: 1.1rem;
-    }
-
+    .passport-header { text-align: center; font-size: 2.2rem; color: #f33; margin-bottom: 20px; }
+    .passport-field { margin: 12px 0; font-size: 1.1rem; }
     .field-label { color: #8af; font-weight: bold; }
     .field-value { color: #afa; }
+    .seal { text-align: center; margin-top: 30px; font-family: 'Orbitron'; color: #f33; font-size: 1.4rem; }
 
-    .seal {
-      text-align: center;
-      margin-top: 30px;
-      font-family: 'Orbitron';
-      color: #f33;
-      font-size: 1.4rem;
-    }
-
-    /* Mobile */
     @media (max-width: 650px) {
-      .chat-panel, .map-container { width: 90vw; left: 50%; transform: translateX(-50%); }
-      .chat-panel { top: auto; bottom: 100px; height: 200px; }
+      .chat-panel { width: 90vw; left: 50%; transform: translateX(-50%); top: auto; bottom: 120px; height: 180px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="monitor">
-    <div class="header">
-      [ TECH-PRIEST MONITORING TERMINAL v4.1 | BURAN-4 RECON ]
-    </div>
-
+  <!-- Основной монитор (фазы 0-2) -->
+  <div class="monitor" id="monitor">
+    <div class="header" id="header">[ TECH-PRIEST MONITORING TERMINAL v4.1 | BURAN-4 RECON ]</div>
     <div class="terminal" id="terminal"></div>
-
     <div class="input-line">
       <span class="prompt"></span>
       <input type="text" id="command-input" placeholder=">_"
         autocomplete="off" spellcheck="false">
     </div>
-
     <div class="reactor-glow">
       <div class="glow-dot"></div>
-      <span>REACTOR CORE // NOMINAL (δ = 0.92)</span>
+      <span id="reactor-status">REACTOR CORE // NOMINAL (δ = 0.92)</span>
     </div>
-
+    <div class="sanity-bar">
+      <div class="sanity-label">SANITY: <span id="sanity-value">100</span>%</div>
+      <div class="sanity-progress"><div class="sanity-fill" id="sanity-fill"></div></div>
+    </div>
     <button class="export-btn" id="export-pdf">🖨 EXPORT TECH-PASSPORT</button>
 
-    <!-- Чат с хакером -->
     <div class="chat-panel" id="chat-panel">
       <div class="chat-header">> SECURE CHANNEL // PHANTOM</div>
       <div class="chat-messages" id="chat-messages"></div>
     </div>
+  </div>
 
-    <!-- Головоломка XOR -->
-    <div class="xor-puzzle" id="xor-puzzle">
-      <div>DECRYPT KEY XOR.PAD — DRAG BYTES TO RECONSTRUCT</div>
-      <div class="xor-grid" id="xor-grid"></div>
-      <div id="xor-result"></div>
-      <button id="xor-submit">VERIFY CRC</button>
-    </div>
+  <!-- Фаза 3: Реактор (3D) -->
+  <div class="reactor-scene" id="reactor-scene">
+    <a-scene
+      renderer="antialias: true; physicallyCorrectLights: false;"
+      fog="type: exponential; color: #000; density: 0.02"
+      class="fullscreen"
+    >
+      <!-- Камера с курсором управления -->
+      <a-entity id="rig" position="0 1.6 5">
+        <a-camera
+          position="0 0 0"
+          look-controls
+          wasd-controls="acceleration: 20"
+          cursor="rayOrigin: mouse"
+        ></a-camera>
+      </a-entity>
 
-    <!-- Карта -->
-    <div class="map-container" id="map-container">
-      <div class="map-svg"></div>
-      <div class="gps-tracker" id="gps-tracker"></div>
+      <!-- Основание — бетонный пол -->
+      <a-plane
+        position="0 0 0"
+        rotation="-90 0 0"
+        width="40"
+        height="40"
+        color="#222"
+        shader="flat"
+      ></a-plane>
+
+      <!-- Стены — массивные бетонные плиты -->
+      <a-box position="-10 2 0" width="1" height="4" depth="20" color="#333" roughness="1"></a-box>
+      <a-box position="10 2 0" width="1" height="4" depth="20" color="#333" roughness="1"></a-box>
+      <a-box position="0 2 -10" width="20" height="4" depth="1" color="#333" roughness="1"></a-box>
+      <a-box position="0 2 10" width="20" height="4" depth="1" color="#333" roughness="1"></a-box>
+
+      <!-- Сердцевина реактора (пульсирующая) -->
+      <a-entity id="core" position="0 2 0">
+        <a-sphere
+          radius="1.2"
+          color="#f33"
+          metalness="0.8"
+          roughness="0.2"
+          animation="property: scale; from: 1 1 1; to: 1.05 1.05 1.05; dur: 1200; easing: easeInOutSine; loop: true; dir: alternate"
+        ></a-sphere>
+        <a-sphere
+          radius="1.8"
+          color="#f66"
+          opacity="0.2"
+          animation="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 3000; easing: easeInOutSine; loop: true; dir: alternate"
+        ></a-sphere>
+      </a-entity>
+
+      <!-- Панель управления -->
+      <a-plane
+        id="panel"
+        position="4 1.5 -2"
+        rotation="0 90 0"
+        width="2"
+        height="1.2"
+        color="#111"
+        shader="flat"
+      >
+        <a-text
+          value="ACCESS PANEL"
+          position="0 0.4 0.01"
+          color="#0f0"
+          align="center"
+          width="2"
+          font="https://cdn.aframe.io/fonts/monoid.fnt"
+        ></a-text>
+        <a-text
+          value="STATUS: LOCKED"
+          id="panel-status"
+          position="0 0 0.01"
+          color="#8af"
+          align="center"
+          width="2"
+          font="https://cdn.aframe.io/fonts/monoid.fnt"
+        ></a-text>
+      </a-plane>
+
+      <!-- Источник света -->
+      <a-light
+        type="point"
+        color="#ffaa00"
+        intensity="0.8"
+        position="0 3 0"
+      ></a-light>
+      <a-light
+        type="ambient"
+        color="#111"
+      ></a-light>
+    </a-scene>
+
+    <!-- Панель ввода внутри сцены -->
+    <div class="in-scene-panel" id="in-scene-panel">
+      > REACTOR CONTROL // SANITY: <span id="in-scene-sanity">100</span>%
+      <br>Type command: <span class="blink">█</span>
+      <input type="text" class="in-scene-input" id="in-scene-input" placeholder="e.g. scan panel, open airlock, msg phantom...">
     </div>
   </div>
 
-  <!-- Скрытый паспорт для экспорта -->
+  <!-- Паспорт (для экспорта) -->
   <div id="passport">
     <div class="passport-header">ORDO MECHANICUS TECHNICAL PASSPORT</div>
     <div class="passport-field"><span class="field-label">NAME:</span> <span class="field-value">DANYA "ELECTRON" VOLKOV</span></div>
     <div class="passport-field"><span class="field-label">RANK:</span> <span class="field-value">SCRIBE-ANALYST (PROVISIONAL)</span></div>
     <div class="passport-field"><span class="field-label">MISSION:</span> <span class="field-value">BURAN-4 RECON / ZARYA-9 REACTOR</span></div>
     <div class="passport-field"><span class="field-label">COORDINATES:</span> <span class="field-value">45.6307°N, 63.3322°E</span></div>
-    <div class="passport-field"><span class="field-label">AUTH. HASH:</span> <span class="field-value" id="passport-hash">7A3F...E9C1</span></div>
+    <div class="passport-field"><span class="field-label">SANITY:</span> <span class="field-value" id="passport-sanity">100%</span></div>
     <div class="passport-field"><span class="field-label">WARNINGS:</span> <span class="field-value">RADIATION • PSYCHIC ECHO • NO RETURN PROTOCOL</span></div>
     <div class="seal">✠ MACHINA SACRA ✠</div>
   </div>
 
   <script>
-    // === Библиотеки из CDN ===
-    const { jsPDF } = window.jspdf;
+    // === Глобальное состояние ===
+    let state = JSON.parse(localStorage.getItem('buran4_state')) || {
+      phase: 'prelude',
+      sanity: 100,
+      xorSolved: false,
+      gpsDone: false,
+      language: 'ru',
+      chatHistory: []
+    };
 
-    // === STATE ===
-    let phase = localStorage.getItem('buran4_phase') || 'prelude';
-    let chatActive = false;
-    let xorSolved = false;
-    let gpsRunning = false;
-
+    // === DOM ===
+    const monitor = document.getElementById('monitor');
+    const reactorScene = document.getElementById('reactor-scene');
     const terminal = document.getElementById('terminal');
     const input = document.getElementById('command-input');
+    const inSceneInput = document.getElementById('in-scene-input');
     const chatPanel = document.getElementById('chat-panel');
     const chatMessages = document.getElementById('chat-messages');
-    const xorPuzzle = document.getElementById('xor-puzzle');
-    const xorGrid = document.getElementById('xor-grid');
-    const xorResult = document.getElementById('xor-result');
-    const mapContainer = document.getElementById('map-container');
-    const gpsTracker = document.getElementById('gps-tracker');
+    const sanityFill = document.getElementById('sanity-fill');
+    const sanityValue = document.getElementById('sanity-value');
+    const inSceneSanity = document.getElementById('in-scene-sanity');
+    const passportSanity = document.getElementById('passport-sanity');
+    const panelStatus = document.getElementById('panel-status');
     const exportBtn = document.getElementById('export-pdf');
 
-    // === Реальный звук реактора через Web Audio API ===
-    let audioContext, gainNode, oscillator1, oscillator2, noiseBuffer;
+    // === Обновление санити ===
+    function updateSanity(delta = 0) {
+      state.sanity = Math.max(0, Math.min(100, state.sanity + delta));
+      sanityFill.style.width = `${state.sanity}%`;
+      sanityValue.textContent = Math.round(state.sanity);
+      inSceneSanity.textContent = Math.round(state.sanity);
+      passportSanity.textContent = `${Math.round(state.sanity)}%`;
+      
+      // Деградация интерфейса
+      monitor.className = 'monitor';
+      if (state.sanity <= 70) monitor.classList.add('sanity-2');
+      if (state.sanity <= 40) monitor.classList.add('sanity-1');
+      if (state.sanity <= 15) monitor.classList.add('sanity-0');
 
-    function initReactorSound() {
-      try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        gainNode = audioContext.createGain();
-        gainNode.gain.value = 0.15; // тихо, но ощутимо
-
-        // Основной гул ~17 Гц (инфразвук, но слышен как вибрация)
-        oscillator1 = audioContext.createOscillator();
-        oscillator1.type = 'sine';
-        oscillator1.frequency.value = 17.3;
-
-        // Модуляция + шум
-        oscillator2 = audioContext.createOscillator();
-        oscillator2.type = 'triangle';
-        oscillator2.frequency.value = 0.3; // LFO
-
-        const lfoGain = audioContext.createGain();
-        lfoGain.gain.value = 2.0;
-        oscillator2.connect(lfoGain);
-        lfoGain.connect(oscillator1.frequency);
-
-        // Белый шум (для "треска")
-        const bufferSize = audioContext.sampleRate * 2; // 2 секунды
-        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          output[i] = Math.random() * 2 - 1;
-        }
-        const noiseSource = new AudioBufferSourceNode(audioContext, { buffer: noiseBuffer });
-        noiseSource.loop = true;
-        const noiseGain = audioContext.createGain();
-        noiseGain.gain.value = 0.03;
-
-        // Соединяем
-        oscillator1.connect(gainNode);
-        noiseSource.connect(noiseGain);
-        noiseGain.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-
-        oscillator1.start();
-        oscillator2.start();
-        noiseSource.start();
-
-        // Периодические "импульсы" — как помехи
-        setInterval(() => {
-          if (audioContext.state === 'running') {
-            const impulse = audioContext.createBufferSource();
-            const impulseBuffer = audioContext.createBuffer(1, 100, audioContext.sampleRate);
-            const impulseData = impulseBuffer.getChannelData(0);
-            for (let i = 0; i < 100; i++) impulseData[i] = Math.sin(i * 0.2) * Math.exp(-i / 20);
-            impulse.buffer = impulseBuffer;
-            const impGain = audioContext.createGain();
-            impGain.gain.value = 0.2;
-            impulse.connect(impGain);
-            impGain.connect(gainNode);
-            impulse.start();
-          }
-        }, 12000 + Math.random() * 8000);
-      } catch (e) {
-        console.warn("Audio init failed:", e);
+      // Критическая деградация
+      if (state.sanity <= 0) {
+        log("[SYS] SANITY CRITICAL — AUTONOMOUS PROTOCOL ENGAGED", 'err');
+        setTimeout(() => {
+          log("> EXECUTING: merge_with_machine --force", 'sys');
+          showEnding('merge');
+        }, 2000);
       }
     }
 
-    // Запуск звука по клику (обход политики браузеров)
-    document.body.addEventListener('click', () => {
-      if (!audioContext) initReactorSound();
-    }, { once: true });
-
-    // === UTILS ===
-    function typeText(text, delay = 25, callback = null) {
-      const lines = text.split('\n');
-      let i = 0;
-      const interval = setInterval(() => {
-        if (i < lines.length) {
-          log(lines[i]);
-          i++;
-        } else {
-          clearInterval(interval);
-          if (callback) setTimeout(callback, 300);
-        }
-      }, delay);
-    }
-
+    // === Логгер ===
     function log(msg, cls = '') {
       const now = new Date();
       const ts = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().padStart(2,'0')}]`;
@@ -464,329 +448,222 @@
       terminal.scrollTop = terminal.scrollHeight;
     }
 
+    // === Чат ===
     function chat(msg, from = 'them') {
       const div = document.createElement('div');
       div.className = `chat-msg ${from}`;
       div.textContent = msg;
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
+      state.chatHistory.push({ from, msg });
     }
 
-    // === СЦЕНЫ ===
-    const scenes = {
+    // === Голоса (простая имитация) ===
+    function playVoice(text, delay = 0) {
+      setTimeout(() => {
+        log(`[VOICE] "${text}" — (direction: unknown)`, 'warn');
+        updateSanity(-8);
+        // Здесь можно добавить Web Speech API или аудиофрагменты
+      }, delay);
+    }
+
+    // === Финалы ===
+    function showEnding(type) {
+      let title, desc;
+      if (type === 'escape') {
+        title = "FINAL TRANSMISSION — ESCAPE";
+        desc = "Вы выбежали наружу. Ворота захлопнулись. За спиной — вой сирен и гул, растущий в октаве.\n\nPhantom: \"Ты принёс данные. Но ты не тот, кем был.\"\n\n[ФАЙЛ ПРИКРЕПЛЕН: BURAN4_CORE_DUMP.bin]";
+      } else if (type === 'stay') {
+        title = "FINAL TRANSMISSION — OBSERVATION";
+        desc = "Вы остались. Наблюдаете. Сердцевина пульсирует в ритме вашего сердца.\n\nСтены шепчут: *«Он просыпается»*.\n\nВы больше не человек. Вы — сторож.\n\n[СТАТУС: STANDBY // INFINITE]";
+      } else {
+        title = "FINAL TRANSMISSION — MERGE";
+        desc = "Вы ввели команду. Интерфейс растворился.\n\nВаши руки — провода. Глаза — линзы. Мысли — поток данных.\n\n*«Добро пожаловать домой, Электрон»*\n\n[СТАТУС: UNIT Ψ-7 // ONLINE]";
+      }
+
+      reactorScene.classList.remove('active');
+      monitor.classList.add('active');
+      terminal.innerHTML = `
+        <div class="sys" style="text-align:center; font-size:1.8rem; margin:20px 0;">${title}</div>
+        <div style="white-space:pre-line; margin:20px 0;">${desc}</div>
+        <div style="text-align:center; margin-top:30px;">
+          <button onclick="location.reload()" style="padding:10px 20px; background:#222; border:1px solid #0f0;">🔁 RESTART</button>
+        </div>
+      `;
+    }
+
+    // === Фазы ===
+    const phases = {
       prelude: () => {
-        typeText(`
-> SYSTEM INIT — TECH-PRIEST KERNEL v4.1
-> LOADING PROFILE: DANYA "ELECTRON" VOLKOV
-> LOCATION: MOSCOW, USSR — 21 DEC 1991 — 23:47
-
-> BACKGROUND:
-  - BURAN-4: CLASSIFIED SOVIET PROJECT (1985–1989)
-  - OFFICIALLY: SHUTTLE UPGRADE
-  - TRUTH: THORIUM REACTOR CORE "ZARYA-9" — SELF-SUSTAINING, PSYCHOTROPIC EMISSIONS
-
-> INTEL:
-  - AMERICAN "LEAK" CONFIRMED: FALSE FLAG
-  - COORDINATES PLANTED TO LURE INVESTIGATORS
-  - 3 TEAMS VANISHED SINCE NOV 1991
-
-> STATUS: NO FLASH DRIVE. NO CONTACT.
-
-> AVAILABLE COMMANDS:
-  [chat phantom] — INITIATE SECURE CHANNEL
-  [sysinfo]      — SHOW TERMINAL STATUS
-  [help]         — LIST COMMANDS
-        `.trim(), 30);
+        log("> SYSTEM INIT — TECH-PRIEST KERNEL v4.1", 'sys');
+        log("> PROFILE: DANYA \"ELECTRON\" VOLKOV", 'sys');
+        log("> DATE: 21 DEC 1991 — 23:47", 'sys');
+        log("\n> COMMANDS:");
+        log("  [chat phantom] — negotiate");
+        log("  [lang en]      — switch language");
+        log("  [help]         — show help");
       },
 
-      // === ЧАТ С ХАКЕРОМ ===
-      startChat: () => {
+      chat: () => {
         chatPanel.classList.add('active');
-        chatActive = true;
-        chat("Connection established. Encryption: AES-256 + one-time pad.", 'them');
-        chat("You’re late, Electron. Market’s hot tonight.", 'them');
-        log("> SECURE CHANNEL OPEN — AWAITING INPUT");
+        chat("Соединение установлено. Шифрование: AES-256.", 'them');
+        chat("Ты опоздал, Электрон. Рынок горит.", 'them');
       },
 
-      negotiate: (msg) => {
-        const lower = msg.toLowerCase();
-        if (lower.includes('price') || lower.includes('сколько')) {
-          chat("3 BTC. Or 5, if you want the *real* coordinates — not the CIA plant.", 'them');
-          chat("I know you’ve got stash from that Mir hack.", 'them');
-        } else if (lower.includes('where') || lower.includes('где')) {
-          chat("Three options:", 'them');
-          chat("1) Gorky Park — dead drop (high risk: FSB patrols)", 'them');
-          chat("2) Chernobyl Exclusion Zone — old reactor office (radiation: 1.1 mSv/h)", 'them');
-          chat("3) Baikonur perimeter — fake guard post (most dangerous, but cleanest data)", 'them');
-          chat("Choose. Timer starts now.", 'them');
-        } else if (lower.includes('baikonur') || lower.includes('3')) {
-          chat("Confirmed. Flash drive in locker #7, post 'Zarya'.", 'them');
-          chat("Password: your birth year XOR 1984.", 'them');
-          chat("Move fast. They’re watching the satellites.", 'them');
-          setTimeout(() => {
-            log("[SYS] FLASH DRIVE ACQUIRED. HASH: 7A3F...E9C1");
-            phase = 'flash';
-            localStorage.setItem('buran4_phase', phase);
-            chatPanel.classList.remove('active');
-            chatActive = false;
-            scenes.flashIntro();
-          }, 2000);
-        } else if (lower.includes('park') || lower.includes('1')) {
-          chat("...You hear sirens in the distance.", 'them');
-          chat("Connection lost.", 'them');
-          setTimeout(() => {
-            log("[ALERT] FSB RAID — TERMINAL COMPROMISED", 'err');
-            log("> REBOOTING IN 5s...", 'warn');
-            setTimeout(() => {
-              terminal.innerHTML = '';
-              phase = 'prelude';
-              localStorage.setItem('buran4_phase', phase);
-              scenes.prelude();
-            }, 5000);
-          }, 1500);
-          return;
-        } else {
-          chat("Be specific. I don’t do riddles.", 'them');
-        }
-      },
+      insideReactor: () => {
+        monitor.style.display = 'none';
+        reactorScene.classList.add('active');
+        log("> AIRLOCK Ψ OPEN — WELCOME TO ZARYA-9", 'sys');
+        updateSanity(-5);
 
-      flashIntro: () => {
-        typeText(`
-> FLASH DRIVE INSERTED: USB 1.0 (Soviet clone)
-> CONTENTS:
-   - MAP_FRAGMENT_01.BIN        [LOCKED]
-   - AUDIO_LOG_BURAN4_07.WAV    [CAUTION: Δf=17.3Hz]
-   - DECRYPT_KEY_XOR.PAD        [CORRUPT — RECONSTRUCT REQUIRED]
-   - _NOTE_FROM_PHANTOM.TXT     [READ]
-
-> EXECUTING: cat _NOTE_FROM_PHANTOM.TXT
-        `.trim(), 30, () => {
-          setTimeout(() => {
-            typeText(`
---- NOTE ---
-Danya,
-
-The key’s scrambled. Soviets used XOR with rotating seed.
-Rebuild it — the CRC32 must match: 0x9A3F2C1D.
-
-If you fail, the map self-wipes.
-
-And Danya… if the reactor hum changes pitch — *run*.
-
-— P.
---- END ---
-            `.trim(), 25, () => {
-              log("\n> OPTIONS:");
-              log("  [1] REPAIR XOR KEY");
-              log("  [2] PLAY AUDIO LOG");
-              log("  [3] ANALYZE MAP (LOCKED)");
-            });
-          }, 800);
-        });
-      },
-
-      // === XOR ГОЛОВОЛОМКА ===
-      showXOR: () => {
-        xorPuzzle.classList.add('active');
-        xorGrid.innerHTML = '';
-
-        // Исходные байты (перемешаны)
-        const shuffled = ['1A', 'F3', '0C', 'B7', '88', '41', 'E2', 'D5'];
-        const correct = ['1A', '0C', '41', '88', 'B7', 'E2', 'F3', 'D5']; // правильный порядок
-
-        shuffled.forEach(byte => {
-          const el = document.createElement('div');
-          el.className = 'xor-byte';
-          el.textContent = byte;
-          el.draggable = true;
-          el.dataset.value = byte;
-
-          el.addEventListener('dragstart', (e) => {
-            e.dataTransfer.setData('text/plain', byte);
-            el.classList.add('dragging');
-          });
-
-          el.addEventListener('dragend', () => {
-            el.classList.remove('dragging');
-          });
-
-          xorGrid.appendChild(el);
-        });
-
-        // Дропзоны
-        for (let i = 0; i < 8; i++) {
-          const drop = document.createElement('div');
-          drop.className = 'xor-dropzone';
-          drop.dataset.index = i;
-          drop.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            drop.style.borderColor = '#0f0';
-          });
-          drop.addEventListener('dragleave', () => {
-            drop.style.borderColor = '#080';
-          });
-          drop.addEventListener('drop', (e) => {
-            e.preventDefault();
-            const byte = e.dataTransfer.getData('text/plain');
-            const dragged = xorGrid.querySelector(`[data-value="${byte}"]`);
-            if (dragged && !drop.textContent) {
-              drop.textContent = byte;
-              dragged.style.display = 'none';
-            }
-            drop.style.borderColor = '#080';
-          });
-          xorGrid.appendChild(drop);
-        }
-
-        document.getElementById('xor-submit').onclick = () => {
-          const order = Array.from(xorGrid.querySelectorAll('.xor-dropzone'))
-            .map(d => d.textContent || '??');
-          const crc = crc32(order.join(''));
-          if (crc === 0x9A3F2C1D) {
-            xorResult.innerHTML = '<span style="color:#afa">✓ CRC MATCH — KEY RECONSTRUCTED</span>';
-            log("> KEY REPAIRED. MAP UNLOCKED.");
-            xorSolved = true;
-            setTimeout(() => {
-              xorPuzzle.classList.remove('active');
-              log("\n> EXECUTING: decrypt MAP_FRAGMENT_01.BIN");
-              log("[OK] MAP DECRYPTED. DISPLAYING ROUTE...");
-              setTimeout(() => scenes.showMap(), 1000);
-            }, 1500);
-          } else {
-            xorResult.innerHTML = `<span class="err">✗ CRC FAIL — EXPECTED 0x9A3F2C1D, GOT 0x${crc.toString(16).toUpperCase().padStart(8,'0')}</span>`;
-          }
-        };
-      },
-
-      // === КАРТА ===
-      showMap: () => {
-        mapContainer.classList.add('active');
-        log("> INITIATING GPS ROUTE TO BURAN-4");
-        log("  START: Baikonur Perimeter Gate");
-        log("  TARGET: 45.6307°N, 63.3322°E");
-        log("  DISTANCE: 14.3 km");
-
-        setTimeout(() => {
-          gpsRunning = true;
-          gpsTracker.style.transition = 'left 12s linear';
-          gpsTracker.style.left = '85%';
-
-          // Тревоги по пути
-          setTimeout(() => {
-            log("[WARN] RAD SPIKE — 2.4 mSv/h", 'warn');
-          }, 3000);
-
-          setTimeout(() => {
-            log("[ALERT] MOTION DETECTED — 300m AHEAD", 'err');
-            log("         [CAM-7] FEED LOST");
-          }, 6000);
-
-          setTimeout(() => {
-            log("[SYS] ARRIVED AT COORDINATES");
-            log("      STRUCTURE DETECTED: BURIED CONCRETE DOME (DIAM: 48m)");
-            log("      ENTRANCE: AIRLOCK Ψ — POWER: STANDBY");
-            log("\n> FINAL COMMANDS:");
-            log("  [open airlock] — INITIATE ENTRY");
-            log("  [scan perimeter] — LOOK FOR TRAPS");
-          }, 11000);
-        }, 500);
+        setTimeout(() => playVoice("Даня… ты не должен был приходить…", 2000), 1000);
+        setTimeout(() => playVoice("Он знает, что ты здесь.", 5000), 1000);
       }
     };
 
-    // === CRC32 (упрощённая, для демо) ===
-    function crc32(str) {
-      let crc = 0xffffffff;
-      const bytes = new TextEncoder().encode(str);
-      for (let b of bytes) {
-        crc ^= b;
-        for (let i = 0; i < 8; i++) {
-          crc = (crc & 1) ? (crc >>> 1) ^ 0xEDB88320 : crc >>> 1;
+    // === Обработка команд ===
+    function handleCommand(cmd, fromScene = false) {
+      const lower = cmd.toLowerCase().trim();
+      const srcInput = fromScene ? inSceneInput : input;
+      if (!fromScene) log(`> ${cmd}`);
+
+      // Команды внутри реактора
+      if (state.phase === 'reactor') {
+        if (lower === 'scan panel' || lower === 'осмотреть панель') {
+          log("> SCANNING CONTROL PANEL…", 'sys');
+          log("  MODEL: ZARYA-9 CMD UNIT v3 (1987)");
+          log("  LOCK: XOR-KEY REQUIRED (SEE FLASH DRIVE)");
+          log("  WARNING: PSYCHIC DAMPING — 43% DEGRADED");
+          updateSanity(-3);
+        } else if (lower === 'open airlock' || lower === 'открыть шлюз') {
+          log("[DOOR] HISS — HYDRAULICS ENGAGED", 'sys');
+          log("[LIGHT] GREEN → AMBER → RED", 'warn');
+          log("[VOICE] *…welcome…home…*", 'warn');
+          updateSanity(-10);
+          setTimeout(() => phases.insideReactor(), 1500);
+        } else if (lower.startsWith('msg phantom') || lower.startsWith('написать хакеру')) {
+          const msg = cmd.split(' ').slice(2).join(' ') || 'help';
+          chat(msg, 'me');
+          setTimeout(() => {
+            if (state.sanity > 80) {
+              chat("Я вижу твои координаты. Беги. Сейчас.", 'them');
+            } else if (state.sanity > 50) {
+              chat("Сигнал искажён… Я слышу… *голоса*…", 'them');
+            } else {
+              chat("…ты уже не Даня…", 'them');
+            }
+            updateSanity(-5);
+          }, 2000);
+        } else if (lower === 'status' || lower === 'статус') {
+          log(`> SANITY: ${Math.round(state.sanity)}%`);
+          log(`> LOCATION: AIRLOCK Ψ`);
+          log(`> CORE STATUS: PULSING (17.3 Hz)`);
+        } else if (lower === 'escape' || lower === 'сбежать') {
+          showEnding('escape');
+        } else if (lower === 'stay' || lower === 'остаться') {
+          showEnding('stay');
+        } else if (lower === 'merge' || lower === 'слиться') {
+          showEnding('merge');
+        } else {
+          log("ERR: COMMAND NOT RECOGNIZED", 'err');
         }
+        srcInput.value = '';
+        return;
       }
-      return (~crc >>> 0);
+
+      // Основные команды
+      if (lower === 'chat phantom') {
+        state.phase = 'chat';
+        phases.chat();
+      } else if (lower === 'lang en') {
+        state.language = 'en';
+        document.querySelector('.header').textContent = '[ TECH-PRIEST MONITORING TERMINAL v4.1 | BURAN-4 RECON ]';
+      } else if (lower === 'lang ru') {
+        state.language = 'ru';
+        document.querySelector('.header').textContent = '[ ТЕХНО-СВЯЩЕННИЧЕСКИЙ ТЕРМИНАЛ v4.1 | РАЗВЕДКА БУРАН-4 ]';
+      } else if (lower === 'help' || lower === 'помощь') {
+        log("ДОСТУПНЫЕ КОМАНДЫ:");
+        log("  chat phantom — начать переговоры");
+        log("  lang en/ru   — переключить язык");
+        log("  sysinfo      — статус системы");
+      } else if (lower === 'sysinfo' || lower === 'статус системы') {
+        log("ТЕРМИНАЛ: RETRO-91 KERNEL v2.1");
+        log(`ЗДОРОВЬЕ: ${Math.round(state.sanity)}%`);
+        log("ПАМЯТЬ: 4 МБ (3.2 МБ СВОБОДНО)");
+      } else if (state.phase === 'chat') {
+        chat(cmd, 'me');
+        if (lower.includes('baikonur') || lower.includes('3')) {
+          chat("Подтверждено. Флешка в ящике #7.", 'them');
+          state.phase = 'flash';
+          setTimeout(() => {
+            log("[SYS] ФЛЕШКА ПОЛУЧЕНА. ХЕШ: 7A3F...E9C1", 'sys');
+            log("> СОДЕРЖИМОЕ:");
+            log("   - MAP_FRAGMENT_01.BIN        [ЗАБЛОКИРОВАН]");
+            log("   - DECRYPT_KEY_XOR.PAD        [ПОВРЕЖДЁН]");
+            log("   - _NOTE_FROM_PHANTOM.TXT     [ПРОЧИТАТЬ]");
+            chatPanel.classList.remove('active');
+          }, 2000);
+        }
+      } else if (state.phase === 'flash' && (lower === 'open airlock' || lower === 'открыть шлюз')) {
+        state.phase = 'reactor';
+        localStorage.setItem('buran4_state', JSON.stringify(state));
+        log("> ИНИЦИАЦИЯ ПОСЛЕДОВАТЕЛЬНОСТИ ШЛЮЗА Ψ…", 'sys');
+        setTimeout(() => handleCommand('open airlock', true), 1500);
+      } else {
+        log("ERR: КОМАНДА НЕ РАСПОЗНАНА", 'err');
+      }
+
+      srcInput.value = '';
     }
 
-    // === ЭКСПОРТ В PDF ===
+    // === Обработчики ввода ===
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleCommand(input.value);
+    });
+
+    inSceneInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleCommand(inSceneInput.value, true);
+    });
+
+    // === Экспорт PDF ===
     exportBtn.onclick = () => {
-      log("> GENERATING TECHNICAL PASSPORT...", 'sys');
+      log("> ГЕНЕРАЦИЯ ТЕХНО-ПАСПОРТА…", 'sys');
       html2canvas(document.getElementById('passport')).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
         const pdf = new jsPDF('p', 'mm', 'a4');
-        pdf.setFont('helvetica');
         pdf.addImage(imgData, 'PNG', 10, 10, 190, 250);
-        pdf.save('TECH-PRIEST_PASSPORT_ELECTRON.pdf');
-        log("[OK] PASSPORT EXPORTED", 'sys');
-      }).catch(e => {
-        log(`[ERR] PDF EXPORT FAILED: ${e.message}`, 'err');
+        pdf.save(`TECH-PASSPORT_ELECTRON_${Math.round(state.sanity)}pct.pdf`);
+        log("[OK] ПАСПОРТ ЭКСПОРТИРОВАН", 'sys');
       });
     };
 
-    // === КОМАНДЫ ===
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        const cmd = input.value.trim();
-        log(`> ${cmd}`);
-        input.value = '';
-
-        // Чат активен — отправляем в него
-        if (chatActive) {
-          chat(cmd, 'me');
-          scenes.negotiate(cmd);
-          return;
-        }
-
-        // Основные команды
-        switch (phase) {
-          case 'prelude':
-            if (cmd === 'chat phantom') {
-              scenes.startChat();
-            } else if (cmd === 'sysinfo') {
-              log("TERMINAL: RETRO-91 KERNEL v2.1");
-              log("MEMORY: 4 MB RAM (3.2 MB FREE)");
-              log("STORAGE: 20 MB HDD (FLASH MOUNTED AT /dev/sdb1)");
-              log("SOUND: REACTOR CORE SIM — ACTIVE");
-            } else if (cmd === 'help') {
-              log("COMMANDS: chat phantom | sysinfo | help");
-            } else {
-              log("ERR: COMMAND NOT RECOGNIZED", 'err');
-            }
-            break;
-
-          case 'flash':
-            if (cmd === '1' || cmd === 'repair xor') {
-              scenes.showXOR();
-            } else if (cmd === '2' || cmd === 'play audio') {
-              log("[AUD] ▶ PLAYING AUDIO_LOG_BURAN4_07.WAV", 'sys');
-              log("      [!] HEAR THAT PITCH SHIFT? IT’S NOT SUPPOSED TO DO THAT.", 'warn');
-            } else if (cmd === 'open airlock' && xorSolved) {
-              log("> INITIATING AIRLOCK Ψ SEQUENCE...");
-              log("[DOOR] HISS — HYDRAULICS ENGAGED");
-              log("[LIGHT] GREEN → AMBER → RED");
-              log("[VOICE] *...welcome...home...* (distorted)");
-              log("\n> [ENTER] TO STEP INSIDE — OR TYPE 'abort'");
-              // → Следующая фаза: внутрь реактора...
-            } else {
-              log("ERR: MAP LOCKED — REPAIR KEY FIRST", 'err');
-            }
-            break;
-
-          default:
-            log("ERR: UNKNOWN STATE", 'err');
-        }
-      }
-    });
+    // === Service Worker для офлайн ===
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(err => console.warn('SW failed:', err));
+      // Динамически создаём sw.js
+      const swContent = `
+        self.addEventListener('install', e => e.waitUntil(self.skipWaiting()));
+        self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+        self.addEventListener('fetch', () => {}); // Пока заглушка — можно расширить
+      `;
+      const blob = new Blob([swContent], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      // В продакшене — сохранить как sw.js на сервере
+    }
 
     // === СТАРТ ===
-    window.addEventListener('load', () => {
-      log("> BOOTING TECH-PRIEST TERMINAL...", 'sys');
-      setTimeout(() => {
-        if (phase === 'flash') {
-          scenes.flashIntro();
-        } else {
-          scenes.prelude();
-        }
-      }, 800);
-    });
+    updateSanity(0); // инициализация
+    if (state.phase === 'reactor') {
+      phases.insideReactor();
+    } else {
+      phases.prelude();
+    }
+
+    // Сохранение состояния каждые 2 сек
+    setInterval(() => {
+      localStorage.setItem('buran4_state', JSON.stringify(state));
+    }, 2000);
   </script>
 </body>
 </html>
