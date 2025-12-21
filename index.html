@@ -121,10 +121,26 @@
   <!-- Терминал -->
   <div class="terminal" id="terminal">
     <div class="terminal-log system-log">[СИСТЕМА] Добро пожаловать в сеть "Зенит-7". Уровень доступа: ГОСТЬ</div>
-    <div class="terminal-log">[ИНФО] Для продолжения используйте команды: help, connect, scan, decrypt, xor_key, override, passport, exit</div>
+    <div class="terminal-log">[ИНФО] Команды: help, chat, connect, scan, decrypt, xor_key, override, passport, exit</div>
     <div class="input-line">
       <span class="prompt">zenit7@electron:~$ </span>
       <input type="text" id="terminal-input" autofocus>
+    </div>
+  </div>
+
+  <!-- Полноэкранный чат с хакером -->
+  <div id="chat-screen" class="chat-hidden">
+    <div class="chat-header">
+      [ SECURE IRC // CHANNEL #UNDERGROUND — ENCRYPTION: AES-256 ]
+    </div>
+    <div class="chat-log" id="chat-log">
+      <div class="chat-msg system">● Connection established. Protocol: SSL + OTP</div>
+      <div class="chat-msg them">CIA_Source has joined #underground</div>
+      <div class="chat-msg them">CIA_Source: кто купит координаты секретного объекта?</div>
+    </div>
+    <div class="chat-input">
+      <span class="chat-prompt">&gt; </span>
+      <input type="text" id="chat-input" placeholder="напишите сообщение..." autocomplete="off">
     </div>
   </div>
 
