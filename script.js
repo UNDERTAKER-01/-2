@@ -414,3 +414,18 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('❌ SW failed:', err));
   });
 }
+let gameData = JSON.parse(localStorage.getItem('buran4_quest') || 
+  JSON.stringify({
+    step: 1,
+    sanity: 100,
+    xorKey: null,
+    // === НОВОЕ: состояние чата ===
+    chat: {
+      state: 'greeting', // greeting → price_asked → location_asked → negotiation → done/fail
+      askedPrice: false,
+      askedLocation: false,
+      chosenOption: null,
+      messages: []
+    }
+  })
+);
