@@ -1,0 +1,221 @@
+:root {
+  --bg: #000;
+  --text: #00ff00;
+  --panel: #0a150a;
+  --border: #005500;
+  --error: #ff0000;
+  --warn: #ffff00;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Courier New', monospace;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Шумовой фон */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* Деградация интерфейса */
+body.sanity-low {
+  filter: hue-rotate(60deg) saturate(1.3);
+}
+body.sanity-critical {
+  filter: hue-rotate(180deg) saturate(0.4) brightness(0.7);
+  text-shadow: 0 0 5px #f33;
+}
+
+/* Комикс-панель */
+.comic-container {
+  height: 70vh;
+  border-bottom: 3px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.comic-slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 1s ease;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.comic-slide.active {
+  opacity: 1;
+  z-index: 10;
+}
+
+.slide-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-shadow: 0 0 8px var(--text);
+  letter-spacing: 2px;
+}
+
+.slide-text {
+  font-size: 16px;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 10px 0;
+  text-align: left;
+}
+
+.ascii-art {
+  font-family: monospace;
+  font-size: 12px;
+  background: #001100;
+  border: 1px solid var(--border);
+  padding: 15px;
+  margin: 15px 0;
+  white-space: pre;
+  overflow: auto;
+  max-height: 200px;
+  text-align: left;
+}
+
+/* Терминал */
+.terminal {
+  height: 30vh;
+  background: var(--panel);
+  padding: 15px;
+  overflow-y: auto;
+  border-top: 2px solid var(--border);
+}
+
+.terminal-log {
+  margin-bottom: 10px;
+  min-height: 20px;
+}
+
+.prompt {
+  color: #00aa00;
+  font-weight: bold;
+}
+
+.input-line {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+#terminal-input {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font: inherit;
+  outline: none;
+  width: 100%;
+  caret-color: var(--text);
+}
+
+/* Эффекты */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.blink {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.sanity-critical .blink {
+  animation: blink-red 0.8s infinite;
+}
+
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.8;
+}
+
+.glitch::before {
+  color: var(--error);
+  animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  color: #00ffff;
+  animation: glitch-anim 3s infinite linear alternate-reverse;
+  opacity: 0.6;
+}
+
+@keyframes glitch-anim {
+  0% { clip-path: polygon(0 0, 100% 0, 100% 20%, 0 20%); transform: translate(0, 0); }
+  20% { clip-path: polygon(0 20%, 100% 20%, 100% 40%, 0 40%); transform: translate(-2px, 2px); }
+  40% { clip-path: polygon(0 40%, 100% 40%, 100% 60%, 0 60%); transform: translate(2px, -2px); }
+  60% { clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); transform: translate(1px, -1px); }
+  80% { clip-path: polygon(0 80%, 100% 80%, 100% 100%, 0 100%); transform: translate(-1px, 1px); }
+  100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transform: translate(0, 0); }
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 255, 0, 0.05) 50%,
+    transparent 100%
+  );
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+/* Респонсив */
+@media (max-width: 768px) {
+  .slide-title { font-size: 22px; }
+  .slide-text { font-size: 14px; }
+  .ascii-art { font-size: 10px; padding: 8px; }
+  .terminal { height: 40vh; }
+  .comic-container { height: 60vh; }
+}
