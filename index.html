@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>СПУТНИКОВЫЙ МОНИТОРИНГ 90-х</title>
+    <title>КОСМИЧЕСКИЙ МОНИТОРИНГ 90-х | Солнечная система</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Press+Start+2P|Orbitron:400,700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,7 +14,7 @@
         <header>
             <div class="header-top">
                 <img src="https://img.icons8.com/color/96/000000/satellite.png" alt="Спутник" class="logo">
-                <h1><span class="blink">●</span> ЦЕНТР КОСМИЧЕСКОГО КОНТРОЛЯ <span class="blink">●</span></h1>
+                <h1><span class="blink">●</span> ЦЕНТР КОСМИЧЕСКОГО МОНИТОРИНГА <span class="blink">●</span></h1>
                 <div class="system-time">
                     <span id="clock">00:00:00 UTC</span>
                 </div>
@@ -22,302 +22,278 @@
             
             <div class="status-line">
                 <div class="status-item">
-                    <span class="label">СТАТУС СИСТЕМЫ:</span>
-                    <span class="value online">НОРМАЛЬНЫЙ</span>
+                    <span class="label">СИСТЕМА:</span>
+                    <span class="value online">СОЛНЕЧНАЯ СИСТЕМА</span>
                 </div>
                 <div class="status-item">
-                    <span class="label">АКТИВНЫХ СПУТНИКОВ:</span>
-                    <span class="value" id="active-satellites">47</span>
+                    <span class="label">СПУТНИКИ:</span>
+                    <span class="value" id="total-satellites">156</span>
                 </div>
                 <div class="status-item">
-                    <span class="label">ОТСЛЕЖИВАЕТСЯ:</span>
-                    <span class="value" id="tracking-count">12</span>
+                    <span class="label">ПЛАНЕТЫ:</span>
+                    <span class="value">9</span>
                 </div>
                 <div class="status-item">
-                    <span class="label">СИГНАЛ ЦЕНТРА:</span>
-                    <span class="value signal-excellent">100%</span>
+                    <span class="label">РЕЖИМ:</span>
+                    <span class="value" id="system-mode">РЕАЛЬНОЕ ВРЕМЯ</span>
                 </div>
             </div>
             
             <div class="marquee">
                 <marquee behavior="scroll" direction="left" scrollamount="3">
-                    ★★ СИСТЕМА ГЛОБАЛЬНОГО МОНИТОРИНГА ★★ ВЕРСИЯ 3.5 ★★ 1998 ★★ ДАТА: 15.12.1998 ★★ ВРЕМЯ МОСКОВСКОЕ: 14:30 ★★
+                    ★★ СИСТЕМА МОНИТОРИНГА СОЛНЕЧНОЙ СИСТЕМЫ ★★ ВЕРСИЯ 4.0 ★★ 1999 ★★ МАСШТАБ: 1:100 МЛН ★★ СКОРОСТЬ: 1x ★★
                 </marquee>
             </div>
         </header>
 
         <!-- Основное содержимое -->
         <div class="main-grid">
-            <!-- Левая панель - Управление и самоуничтожение -->
+            <!-- Левая панель - Управление -->
             <aside class="left-panel">
-                <!-- Панель самоуничтожения -->
-                <div class="destruction-panel">
-                    <div class="destruction-header">
-                        <i class="fas fa-skull-crossbones"></i>
-                        <h2>СИСТЕМА САМОУНИЧТОЖЕНИЯ</h2>
-                    </div>
+                <!-- Панель управления солнечной системой -->
+                <div class="system-control-panel">
+                    <h2><i class="fas fa-solar-system"></i> УПРАВЛЕНИЕ СИСТЕМОЙ</h2>
                     
-                    <div class="destruction-status">
-                        <div class="status-indicator">
-                            <div class="status-light safe"></div>
-                            <span>СИСТЕМА ЗАБЛОКИРОВАНА</span>
-                        </div>
-                        <div class="destruction-timer">
-                            <span>ДО АВТОМАТИЧЕСКОЙ АКТИВАЦИИ:</span>
-                            <span class="timer">72:00:00</span>
-                        </div>
-                    </div>
-                    
-                    <div class="destruction-controls">
-                        <div class="control-step">
-                            <span class="step-number">1</span>
-                            <span class="step-text">ВВЕДИТЕ КОД ДОСТУПА</span>
-                            <input type="password" class="access-code" placeholder="••••••••" maxlength="8">
-                        </div>
-                        
-                        <div class="control-step">
-                            <span class="step-number">2</span>
-                            <span class="step-text">ПОДТВЕРДИТЕ ИДЕНТИФИКАЦИЮ</span>
-                            <div class="verification">
-                                <button class="verify-btn">СКАНИРОВАТЬ ОТПЕЧАТОК</button>
-                                <button class="verify-btn">ГОЛОСОВАЯ ВЕРИФИКАЦИЯ</button>
-                            </div>
-                        </div>
-                        
-                        <div class="control-step">
-                            <span class="step-number">3</span>
-                            <span class="step-text">ПОДТВЕРДИТЕ ПРИКАЗ</span>
-                            <div class="confirmation-check">
-                                <label>
-                                    <input type="checkbox" id="confirm-order">
-                                    ПОДТВЕРЖДАЮ ПРИКАЗ НА УНИЧТОЖЕНИЕ
-                                </label>
+                    <div class="control-group">
+                        <label>МАСШТАБ:</label>
+                        <div class="scale-control">
+                            <input type="range" min="1" max="10" value="5" class="scale-slider">
+                            <div class="scale-display">
+                                <span>1:1 млрд</span>
+                                <span class="active">1:100 млн</span>
+                                <span>1:10 млн</span>
                             </div>
                         </div>
                     </div>
                     
-                    <button class="destruction-btn" id="destruction-btn" disabled>
-                        <i class="fas fa-bomb"></i>
-                        <span>АКТИВИРОВАТЬ ПРОТОКОЛ САМОУНИЧТОЖЕНИЯ</span>
-                    </button>
+                    <div class="control-group">
+                        <label>СКОРОСТЬ ВРЕМЕНИ:</label>
+                        <div class="time-speed">
+                            <button class="speed-btn" data-speed="0">СТОП</button>
+                            <button class="speed-btn active" data-speed="1">1x</button>
+                            <button class="speed-btn" data-speed="10">10x</button>
+                            <button class="speed-btn" data-speed="100">100x</button>
+                            <button class="speed-btn" data-speed="1000">1000x</button>
+                        </div>
+                    </div>
                     
-                    <div class="destruction-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>ВНИМАНИЕ: АКТИВАЦИЯ ПРИВЕДЕТ К ПОЛНОМУ УНИЧТОЖЕНИЮ ВСЕХ 47 СПУТНИКОВ</p>
+                    <div class="control-group">
+                        <label>ВИД:</label>
+                        <div class="view-control">
+                            <button class="view-btn active" data-view="orbits">
+                                <i class="fas fa-circle"></i>
+                                <span>ОРБИТЫ</span>
+                            </button>
+                            <button class="view-btn" data-view="grid">
+                                <i class="fas fa-th"></i>
+                                <span>СЕТКА</span>
+                            </button>
+                            <button class="view-btn" data-view="labels">
+                                <i class="fas fa-tag"></i>
+                                <span>МЕТКИ</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label>ЦЕНТРИРОВАТЬ НА:</label>
+                        <select class="center-select" id="center-select">
+                            <option value="sun">СОЛНЦЕ</option>
+                            <option value="earth">ЗЕМЛЯ</option>
+                            <option value="mars">МАРС</option>
+                            <option value="jupiter">ЮПИТЕР</option>
+                            <option value="saturn">САТУРН</option>
+                        </select>
                     </div>
                 </div>
                 
-                <!-- Панель управления -->
-                <div class="control-panel">
-                    <h2><i class="fas fa-gamepad"></i> УПРАВЛЕНИЕ СИСТЕМОЙ</h2>
+                <!-- Панель спутниковых группировок -->
+                <div class="satellite-groups">
+                    <h2><i class="fas fa-satellite"></i> ГРУППИРОВКИ СПУТНИКОВ</h2>
                     
-                    <div class="control-group">
-                        <label>РЕЖИМ СЛЕЖЕНИЯ:</label>
-                        <div class="mode-selector">
-                            <button class="mode-btn active">
-                                <i class="fas fa-robot"></i>
-                                <span>АВТОМАТИЧЕСКИЙ</span>
-                            </button>
-                            <button class="mode-btn">
-                                <i class="fas fa-hand-pointer"></i>
-                                <span>РУЧНОЙ</span>
-                            </button>
-                            <button class="mode-btn">
-                                <i class="fas fa-bullseye"></i>
-                                <span>ПРИОРИТЕТНЫЙ</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label>МАСШТАБ КАРТЫ:</label>
-                        <div class="zoom-control">
-                            <input type="range" min="1" max="5" value="3" class="zoom-slider">
-                            <div class="zoom-levels">
-                                <span>1x</span>
-                                <span>2x</span>
-                                <span class="active">3x</span>
-                                <span>4x</span>
-                                <span>5x</span>
+                    <div class="group-list">
+                        <div class="group-item active" data-group="all">
+                            <div class="group-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">ВСЕ СПУТНИКИ</div>
+                                <div class="group-count">156</div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="control-group">
-                        <label>СКОРОСТЬ ОБНОВЛЕНИЯ:</label>
-                        <div class="speed-control">
-                            <button class="speed-btn">0.5x</button>
-                            <button class="speed-btn active">1x</button>
-                            <button class="speed-btn">2x</button>
-                            <button class="speed-btn">5x</button>
+                        
+                        <div class="group-item" data-group="earth">
+                            <div class="group-icon">
+                                <i class="fas fa-globe-americas"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">ЗЕМНЫЕ</div>
+                                <div class="group-count">47</div>
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="tracking-controls">
-                        <button class="track-btn" id="track-all-btn">
-                            <i class="fas fa-crosshairs"></i>
-                            <span>ОТСЛЕЖИВАТЬ ВСЕ</span>
-                        </button>
-                        <button class="track-btn" id="clear-tracking-btn">
-                            <i class="fas fa-ban"></i>
-                            <span>ОЧИСТИТЬ</span>
-                        </button>
-                        <button class="track-btn" id="track-critical-btn">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>КРИТИЧЕСКИЕ</span>
-                        </button>
+                        
+                        <div class="group-item" data-group="mars">
+                            <div class="group-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">МАРСИАНСКИЕ</div>
+                                <div class="group-count">5</div>
+                            </div>
+                        </div>
+                        
+                        <div class="group-item" data-group="jupiter">
+                            <div class="group-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">ЮПИТЕРИАНСКИЕ</div>
+                                <div class="group-count">8</div>
+                            </div>
+                        </div>
+                        
+                        <div class="group-item" data-group="navigation">
+                            <div class="group-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">НАВИГАЦИОННЫЕ</div>
+                                <div class="group-count">24</div>
+                            </div>
+                        </div>
+                        
+                        <div class="group-item" data-group="communication">
+                            <div class="group-icon">
+                                <i class="fas fa-broadcast-tower"></i>
+                            </div>
+                            <div class="group-info">
+                                <div class="group-name">СВЯЗЬ</div>
+                                <div class="group-count">32</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Панель радара -->
-                <div class="radar-panel">
-                    <h2><i class="fas fa-satellite-dish"></i> РАДАР СЛЕЖЕНИЯ</h2>
-                    
-                    <div class="radar-display">
-                        <canvas id="radar-canvas"></canvas>
-                        <div class="radar-overlay">
-                            <div class="radar-center">
-                                <i class="fas fa-crosshairs"></i>
-                            </div>
-                            <div class="radar-sweep"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="radar-info">
-                        <div class="radar-stat">
-                            <span>СКОРОСТЬ ВРАЩЕНИЯ:</span>
-                            <span class="radar-speed">0.5 RPM</span>
-                        </div>
-                        <div class="radar-stat">
-                            <span>ОБНАРУЖЕНО ЦЕЛЕЙ:</span>
-                            <span id="radar-targets">18</span>
-                        </div>
-                        <div class="radar-stat">
-                            <span>ДИАПАЗОН:</span>
-                            <span>50,000 КМ</span>
-                        </div>
+                <!-- Панель информации о планете -->
+                <div class="planet-info-panel">
+                    <h2><i class="fas fa-info-circle"></i> АКТИВНАЯ ПЛАНЕТА</h2>
+                    <div class="planet-details" id="planet-details">
+                        <!-- Информация будет заполнена JS -->
                     </div>
                 </div>
             </aside>
 
-            <!-- Центральная карта -->
+            <!-- Центральная карта Солнечной системы -->
             <main class="main-content">
                 <div class="map-header">
-                    <h2><i class="fas fa-globe-americas"></i> КАРТА ОРБИТАЛЬНЫХ ТРАЕКТОРИЙ</h2>
+                    <h2><i class="fas fa-solar-system"></i> ИНТЕРАКТИВНАЯ КАРТА СОЛНЕЧНОЙ СИСТЕМЫ</h2>
                     <div class="map-controls">
-                        <button class="map-btn" id="zoom-in-btn">
-                            <i class="fas fa-search-plus"></i>
+                        <button class="map-btn" id="toggle-orbits">
+                            <i class="fas fa-circle"></i>
+                            <span>ОРБИТЫ</span>
                         </button>
-                        <button class="map-btn" id="zoom-out-btn">
-                            <i class="fas fa-search-minus"></i>
+                        <button class="map-btn" id="toggle-grid">
+                            <i class="fas fa-th"></i>
+                            <span>СЕТКА</span>
                         </button>
-                        <button class="map-btn" id="center-map-btn">
-                            <i class="fas fa-crosshairs"></i>
+                        <button class="map-btn" id="toggle-trails">
+                            <i class="fas fa-wave-square"></i>
+                            <span>СЛЕДЫ</span>
                         </button>
-                        <button class="map-btn" id="reset-map-btn">
+                        <button class="map-btn" id="reset-view">
                             <i class="fas fa-redo"></i>
+                            <span>СБРОС</span>
                         </button>
                     </div>
                 </div>
                 
-                <div class="galaxy-map" id="galaxy-map">
-                    <!-- Карта будет рисоваться здесь -->
+                <div class="solar-system-map" id="solar-system-map">
+                    <!-- Солнечная система будет отрисована здесь -->
                 </div>
                 
-                <div class="map-legend">
-                    <div class="legend-item">
-                        <span class="legend-dot normal"></span>
-                        <span>НОРМАЛЬНЫЙ</span>
+                <div class="system-info">
+                    <div class="info-item">
+                        <span class="info-label">РАССТОЯНИЕ ОТ СОЛНЦА:</span>
+                        <span class="info-value" id="distance-from-sun">0 а.е.</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-dot tracking"></span>
-                        <span>ОТСЛЕЖИВАЕТСЯ</span>
+                    <div class="info-item">
+                        <span class="info-label">МАСШТАБ:</span>
+                        <span class="info-value">1:100 млн</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-dot warning"></span>
-                        <span>ПРЕДУПРЕЖДЕНИЕ</span>
+                    <div class="info-item">
+                        <span class="info-label">СКОРОСТЬ:</span>
+                        <span class="info-value">1x</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-dot critical"></span>
-                        <span>КРИТИЧЕСКИЙ</span>
+                    <div class="info-item">
+                        <span class="info-label">СПУТНИКОВ ВИДНО:</span>
+                        <span class="info-value" id="visible-satellites">47</span>
                     </div>
                 </div>
             </main>
 
-            <!-- Правая панель - Список спутников -->
+            <!-- Правая панель - Детали и управление -->
             <aside class="right-panel">
-                <div class="satellites-list-panel">
-                    <div class="list-header">
-                        <h2><i class="fas fa-satellite"></i> КАТАЛОГ СПУТНИКОВ</h2>
-                        <div class="list-controls">
-                            <button class="list-btn active" data-filter="all">ВСЕ (47)</button>
-                            <button class="list-btn" data-filter="tracking">ОТСЛЕЖ. (12)</button>
-                            <button class="list-btn" data-filter="critical">КРИТ. (5)</button>
-                        </div>
-                    </div>
-                    
-                    <div class="satellites-grid" id="satellites-grid">
-                        <!-- Список спутников будет заполнен JS -->
-                    </div>
-                    
-                    <div class="list-stats">
-                        <div class="list-stat">
-                            <span>ОБЩАЯ МАССА:</span>
-                            <span>124.5 Т</span>
-                        </div>
-                        <div class="list-stat">
-                            <span>СРЕДНИЙ ВОЗРАСТ:</span>
-                            <span>3.2 ГОДА</span>
-                        </div>
-                        <div class="list-stat">
-                            <span>НАРУШЕНИЙ:</span>
-                            <span>8</span>
+                <!-- Детальная информация о выбранном объекте -->
+                <div class="object-details-panel">
+                    <h2><i class="fas fa-crosshairs"></i> ВЫБРАННЫЙ ОБЪЕКТ</h2>
+                    <div class="object-details" id="object-details">
+                        <div class="no-selection">
+                            <i class="fas fa-satellite fa-3x"></i>
+                            <p>Кликните на объект для информации</p>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Информационная панель -->
-                <div class="info-panel">
-                    <h2><i class="fas fa-chart-line"></i> СИСТЕМНАЯ ТЕЛЕМЕТРИЯ</h2>
+                <!-- Панель спутников планеты -->
+                <div class="planet-satellites">
+                    <h2><i class="fas fa-moon"></i> СПУТНИКИ ПЛАНЕТЫ</h2>
+                    <div class="satellites-list" id="satellites-list">
+                        <!-- Список спутников будет заполнен JS -->
+                    </div>
+                </div>
+                
+                <!-- Панель телеметрии -->
+                <div class="telemetry-panel">
+                    <h2><i class="fas fa-chart-line"></i> ТЕЛЕМЕТРИЯ</h2>
                     
                     <div class="telemetry-grid">
                         <div class="telemetry-item">
-                            <div class="telemetry-header">
-                                <span>СИГНАЛ ЦЕНТРА</span>
-                                <span class="telemetry-value">100%</span>
+                            <div class="telemetry-label">
+                                <span>ТЕМПЕРАТУРА</span>
+                                <span class="telemetry-value" id="temperature">-270°C</span>
                             </div>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill signal"></div>
+                                <div class="telemetry-fill" id="temperature-bar"></div>
                             </div>
                         </div>
                         
                         <div class="telemetry-item">
-                            <div class="telemetry-header">
-                                <span>ПРОЦЕССОР</span>
-                                <span class="telemetry-value">42%</span>
+                            <div class="telemetry-label">
+                                <span>РАДИАЦИЯ</span>
+                                <span class="telemetry-value" id="radiation">0.3 мЗв</span>
                             </div>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill cpu"></div>
+                                <div class="telemetry-fill" id="radiation-bar"></div>
                             </div>
                         </div>
                         
                         <div class="telemetry-item">
-                            <div class="telemetry-header">
-                                <span>ПАМЯТЬ</span>
-                                <span class="telemetry-value">78%</span>
+                            <div class="telemetry-label">
+                                <span>СИГНАЛ</span>
+                                <span class="telemetry-value" id="signal">100%</span>
                             </div>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill memory"></div>
+                                <div class="telemetry-fill" id="signal-bar"></div>
                             </div>
                         </div>
                         
                         <div class="telemetry-item">
-                            <div class="telemetry-header">
-                                <span>ПЕРЕДАЧА ДАННЫХ</span>
-                                <span class="telemetry-value">2.4 Гб/с</span>
+                            <div class="telemetry-label">
+                                <span>СКОРОСТЬ</span>
+                                <span class="telemetry-value" id="velocity">0 км/с</span>
                             </div>
                             <div class="telemetry-bar">
-                                <div class="telemetry-fill data"></div>
+                                <div class="telemetry-fill" id="velocity-bar"></div>
                             </div>
                         </div>
                     </div>
@@ -329,54 +305,49 @@
         <footer>
             <div class="footer-content">
                 <div class="footer-left">
-                    <div class="system-health">
-                        <span>СОСТОЯНИЕ СИСТЕМЫ:</span>
-                        <div class="health-bar">
-                            <div class="health-fill"></div>
+                    <div class="system-status">
+                        <div class="status-indicator">
+                            <div class="status-dot online"></div>
+                            <span>СИСТЕМА МОНИТОРИНГА АКТИВНА</span>
                         </div>
-                        <span class="health-value">94%</span>
                     </div>
                 </div>
                 
                 <div class="footer-center">
-                    <div class="warning-indicator">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>СИСТЕМНЫЕ ПРОВЕРКИ В НОРМЕ</span>
+                    <div class="coordinate-display">
+                        <span>КООРДИНАТЫ:</span>
+                        <span id="coordinates">X: 0, Y: 0, Z: 0 а.е.</span>
                     </div>
                 </div>
                 
                 <div class="footer-right">
-                    <div class="operator-info">
-                        <i class="fas fa-user-astronaut"></i>
+                    <div class="time-display">
+                        <i class="fas fa-clock"></i>
                         <div>
-                            <div class="operator-name">ОПЕРАТОР: ПЕТРОВ А.И.</div>
-                            <div class="operator-shift">СМЕНА: 3 (14:00-22:00)</div>
+                            <div class="date" id="current-date">01.01.1999</div>
+                            <div class="sim-time" id="simulation-time">00:00:00</div>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="footer-bottom">
-                <div class="security-level">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>УРОВЕНЬ БЕЗОПАСНОСТИ: МАКСИМАЛЬНЫЙ</span>
-                </div>
                 <div class="copyright">
-                    ЦЕНТР КОСМИЧЕСКОГО КОНТРОЛЯ © 1998 | ВСЕ ПРАВА ЗАЩИЩЕНЫ
+                    ЦЕНТР КОСМИЧЕСКОГО МОНИТОРИНГА © 1999 | СОЛНЕЧНАЯ СИСТЕМА v4.0
                 </div>
-                <div class="connection-status">
-                    <div class="connection-dot connected"></div>
-                    <span>СВЯЗЬ С ЦЕНТРОМ: УСТАНОВЛЕНА</span>
+                <div class="data-source">
+                    <i class="fas fa-database"></i>
+                    <span>ИСТОЧНИК: НАСА/РОСКОСМОС/ЕКА 1998</span>
                 </div>
             </div>
         </footer>
     </div>
 
-    <!-- Модальное окно информации о спутнике -->
-    <div class="modal-overlay" id="satellite-modal">
+    <!-- Модальное окно детальной информации -->
+    <div class="modal-overlay" id="detail-modal">
         <div class="modal">
             <div class="modal-header">
-                <h3><i class="fas fa-satellite"></i> ДЕТАЛЬНАЯ ИНФОРМАЦИЯ О СПУТНИКЕ</h3>
+                <h3 id="modal-title">ДЕТАЛЬНАЯ ИНФОРМАЦИЯ</h3>
                 <button class="modal-close" id="modal-close">
                     <i class="fas fa-times"></i>
                 </button>
@@ -387,13 +358,13 @@
             </div>
             
             <div class="modal-footer">
-                <button class="modal-btn track-btn" id="modal-track-btn">
+                <button class="modal-btn track-btn" id="track-object-btn">
                     <i class="fas fa-crosshairs"></i>
                     <span>ОТСЛЕЖИВАТЬ</span>
                 </button>
-                <button class="modal-btn diagnostics-btn">
-                    <i class="fas fa-stethoscope"></i>
-                    <span>ДИАГНОСТИКА</span>
+                <button class="modal-btn orbit-btn">
+                    <i class="fas fa-satellite"></i>
+                    <span>ОРБИТА</span>
                 </button>
                 <button class="modal-btn close-btn">
                     <span>ЗАКРЫТЬ</span>
