@@ -3,18 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>БУРАН-4 // MONITORING TERMINAL</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <title>БУРАН-4 // TECHNICAL PASSPORT v0.4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --green: #0f0;
+      --dark: #0a0a0a;
+      --darker: #030303;
+      --red: #f33;
+      --amber: #ffaa00;
     }
 
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background-color: #000;
-      color: #0f0;
+      background-color: var(--darker);
+      color: var(--green);
       font-family: 'Share Tech Mono', monospace;
       overflow: hidden;
       height: 100vh;
@@ -24,29 +29,30 @@
     }
 
     .monitor {
-      width: 90vw;
-      max-width: 800px;
-      height: 85vh;
-      background-color: #0a0a0a;
-      border: 8px solid #111;
-      box-shadow: 0 0 30px rgba(0, 80, 0, 0.6), inset 0 0 15px rgba(0, 40, 0, 0.8);
+      width: 94vw;
+      max-width: 900px;
+      height: 94vh;
+      background-color: var(--dark);
+      border: 10px solid #111;
+      box-shadow: 
+        0 0 30px rgba(0, 80, 0, 0.7), 
+        inset 0 0 15px rgba(0, 40, 0, 0.8),
+        inset 0 0 40px rgba(0, 20, 0, 0.3);
       position: relative;
       overflow: hidden;
       padding: 20px;
       border-radius: 4px;
+      font-size: 15px;
     }
 
-    /* Эффект мерцания CRT */
+    /* CRT scanline */
     .monitor::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(0, 30, 0, 0.05), transparent 95%);
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(rgba(0, 30, 0, 0.08), transparent 95%);
       pointer-events: none;
-      animation: scanline 8s linear infinite;
+      animation: scanline 9s linear infinite;
     }
 
     @keyframes scanline {
@@ -56,147 +62,236 @@
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      text-shadow: 0 0 8px #0f0, 0 0 16px #0a0;
+      font-size: 1.5rem;
+      text-shadow: 0 0 6px rgba(0, 255, 0, 0.8), 0 0 12px rgba(0, 120, 0, 0.6);
       letter-spacing: 2px;
+      position: relative;
     }
 
     .terminal {
       line-height: 1.6;
-      font-size: 1.1rem;
-      white-space: pre-wrap;
-      height: calc(100% - 80px);
+      height: calc(100% - 140px);
       overflow-y: auto;
-      padding: 10px;
-      color: #0f0;
-      text-shadow: 0 0 3px #0a0;
+      padding: 12px;
+      color: var(--green);
+      text-shadow: 0 0 3px rgba(0, 60, 0, 0.8);
+      white-space: pre-wrap;
     }
 
-    .blink {
-      animation: blink 1s step-end infinite;
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
+    .blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
 
     .input-line {
-      margin-top: 15px;
+      margin-top: 10px;
       display: flex;
       align-items: center;
     }
 
     .prompt::after {
-      content: '>';
+      content: '█';
       margin-right: 8px;
+      animation: blink 1s step-end infinite;
     }
 
     input {
       flex: 1;
       background: transparent;
       border: none;
-      color: #0f0;
+      color: var(--green);
       font-family: 'Share Tech Mono', monospace;
       font-size: 1.1rem;
       outline: none;
-      text-shadow: 0 0 3px #0a0;
+      text-shadow: 0 0 3px rgba(0, 60, 0, 0.8);
     }
 
-    input::placeholder {
-      color: #080;
-    }
+    .timestamp { color: #8f8; font-size: 0.85rem; opacity: 0.8; }
+    .sys { color: #8af; }
+    .err { color: var(--red); }
+    .warn { color: var(--amber); }
 
-    .timestamp {
-      color: #8f8;
-      font-size: 0.85rem;
-      opacity: 0.8;
-    }
-
-    /* Комикс-панель — имитация всплывающего окна */
-    .comic-panel {
+    /* Чат с хакером */
+    .chat-panel {
       position: absolute;
-      top: 20px;
-      right: 20px;
-      width: 220px;
-      height: 280px;
-      background: #050;
-      border: 2px solid #0f0;
-      box-shadow: 0 0 6px #0a0;
-      padding: 10px;
+      top: 20px; right: 20px;
+      width: 280px;
+      height: 320px;
+      background: rgba(5, 15, 5, 0.9);
+      border: 2px solid var(--green);
+      box-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+      padding: 12px;
       font-size: 0.85rem;
       display: none;
       z-index: 10;
+      overflow-y: auto;
     }
 
-    .comic-panel.active {
-      display: block;
-      animation: popIn 0.4s ease-out;
-    }
-
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    .comic-header {
+    .chat-panel.active { display: block; }
+    .chat-msg { margin-bottom: 10px; line-height: 1.4; }
+    .chat-msg.me { text-align: right; color: #afa; }
+    .chat-msg.them { text-align: left; color: #8af; }
+    .chat-header {
       text-align: center;
       font-weight: bold;
       margin-bottom: 8px;
       border-bottom: 1px dashed #0a0;
       padding-bottom: 4px;
+      font-family: 'Orbitron', sans-serif;
     }
 
-    .comic-img {
-      width: 100%;
-      height: 140px;
-      background: #000 url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="220" height="140" viewBox="0 0 220 140"><rect width="220" height="140" fill="%230a0a0a"/><circle cx="110" cy="70" r="40" fill="none" stroke="%230f0" stroke-width="2"/><text x="110" y="75" text-anchor="middle" fill="%230f0" font-size="12" font-family="monospace">[REDACTED FACE]</text></svg>') center/cover no-repeat;
-      margin-bottom: 8px;
+    /* XOR Puzzle */
+    .xor-puzzle {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
     }
 
-    .comic-text {
-      font-size: 0.8rem;
-      line-height: 1.5;
+    .xor-puzzle.active { display: block; }
+    .xor-grid {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 15px 0;
     }
 
-    /* Звук реактора — индикатор */
-    .reactor-indicator {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
+    .xor-byte {
+      width: 50px; height: 50px;
+      background: #050;
+      border: 1px solid #0a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron';
+      font-size: 1rem;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .xor-byte.dragging { opacity: 0.6; }
+    .xor-dropzone {
+      width: 60px; height: 60px;
+      border: 2px dashed #080;
+      margin: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       font-size: 0.9rem;
-      color: #8f8;
     }
 
-    .reactor-glow {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background: #f00;
+    /* Карта */
+    .map-container {
+      display: none;
+      height: 300px;
+      margin-top: 20px;
+      background: #000;
+      border: 1px solid #080;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-container.active { display: block; }
+
+    .map-svg {
+      width: 100%; height: 100%;
+      background: #001 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='300'%3E%3Crect width='100%25' height='100%25' fill='%23000510'/%3E%3Cpath d='M0,200 L200,180 L400,210 L600,190 L800,220' stroke='%230a0' stroke-width='2' fill='none'/%3E%3Ccircle cx='630' cy='195' r='8' fill='none' stroke='%23f33' stroke-width='2'/%3E%3Ctext x='640' y='190' fill='%23f33' font-size='12' font-family='monospace'%3EBURAN-4%3C/text%3E%3C/svg%3E") center/contain no-repeat;
+    }
+
+    .gps-tracker {
+      position: absolute;
+      top: 50%; left: 10%;
+      width: 12px; height: 12px;
+      background: #0f0;
       border-radius: 50%;
-      margin-right: 6px;
-      box-shadow: 0 0 6px #f00;
-      animation: pulse 2s infinite;
+      box-shadow: 0 0 6px #0f0;
+      transform: translate(-50%, -50%);
+      transition: left 8s linear;
+    }
+
+    /* Reactor glow */
+    .reactor-glow {
+      position: absolute;
+      bottom: 15px; left: 15px;
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .glow-dot {
+      width: 12px; height: 12px;
+      background: #f33;
+      border-radius: 50%;
+      margin-right: 8px;
+      box-shadow: 0 0 6px #f33;
+      animation: pulse 2.2s infinite;
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 0.4; }
+      0%, 100% { opacity: 0.3; }
       50% { opacity: 1; }
     }
 
-    /* Адаптив: на мобильных — убрать комикс-панель, сделать её "всплывающей по клику" */
-    @media (max-width: 600px) {
-      .comic-panel {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90vw;
-        height: auto;
-        max-height: 80vh;
-        overflow-y: auto;
-      }
+    /* Passport export button */
+    .export-btn {
+      position: absolute;
+      bottom: 15px; right: 15px;
+      background: #111;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 6px 12px;
+      font-family: 'Orbitron';
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .export-btn:hover {
+      background: #222;
+      box-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
+    }
+
+    /* PDF Passport (скрытый, для захвата) */
+    #passport {
+      position: absolute;
+      left: -9999px;
+      width: 700px;
+      padding: 40px;
+      background: #0a0a0a;
+      font-family: 'Cinzel', serif;
+      color: #ccc;
+      border: 4px double #888;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .passport-header {
+      text-align: center;
+      font-size: 2.2rem;
+      color: #f33;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px rgba(255, 50, 50, 0.6);
+    }
+
+    .passport-field {
+      margin: 12px 0;
+      font-size: 1.1rem;
+    }
+
+    .field-label { color: #8af; font-weight: bold; }
+    .field-value { color: #afa; }
+
+    .seal {
+      text-align: center;
+      margin-top: 30px;
+      font-family: 'Orbitron';
+      color: #f33;
+      font-size: 1.4rem;
+    }
+
+    /* Mobile */
+    @media (max-width: 650px) {
+      .chat-panel, .map-container { width: 90vw; left: 50%; transform: translateX(-50%); }
+      .chat-panel { top: auto; bottom: 100px; height: 200px; }
     }
   </style>
 </head>
@@ -204,216 +299,492 @@
 
   <div class="monitor">
     <div class="header">
-      [ SYSTEM: BURAN-4 RECON // USSR COLLAPSE ERA — 1991.12.21 ]  
+      [ TECH-PRIEST MONITORING TERMINAL v4.1 | BURAN-4 RECON ]
     </div>
 
     <div class="terminal" id="terminal"></div>
 
     <div class="input-line">
       <span class="prompt"></span>
-      <input type="text" id="command-input" placeholder="_" autocomplete="off" autofocus>
+      <input type="text" id="command-input" placeholder=">_"
+        autocomplete="off" spellcheck="false">
     </div>
 
-    <div class="reactor-indicator">
-      <span class="reactor-glow"></span><span>REACTOR CORE // STANDBY (δ = 0.87)</span>
+    <div class="reactor-glow">
+      <div class="glow-dot"></div>
+      <span>REACTOR CORE // NOMINAL (δ = 0.92)</span>
     </div>
 
-    <div class="comic-panel" id="comic-panel">
-      <div class="comic-header">> INCOMING TRANSMISSION</div>
-      <div class="comic-img" id="comic-img"></div>
-      <div class="comic-text" id="comic-text"></div>
+    <button class="export-btn" id="export-pdf">🖨 EXPORT TECH-PASSPORT</button>
+
+    <!-- Чат с хакером -->
+    <div class="chat-panel" id="chat-panel">
+      <div class="chat-header">> SECURE CHANNEL // PHANTOM</div>
+      <div class="chat-messages" id="chat-messages"></div>
+    </div>
+
+    <!-- Головоломка XOR -->
+    <div class="xor-puzzle" id="xor-puzzle">
+      <div>DECRYPT KEY XOR.PAD — DRAG BYTES TO RECONSTRUCT</div>
+      <div class="xor-grid" id="xor-grid"></div>
+      <div id="xor-result"></div>
+      <button id="xor-submit">VERIFY CRC</button>
+    </div>
+
+    <!-- Карта -->
+    <div class="map-container" id="map-container">
+      <div class="map-svg"></div>
+      <div class="gps-tracker" id="gps-tracker"></div>
     </div>
   </div>
 
-  <audio id="reactor-sound" loop preload="auto">
-    <source src="https://www.soundjay.com/misc/sounds/geiger-counter-1.mp3" type="audio/mpeg">
-    <!-- Лучше заменить на низкочастотный гул реактора: https://freesound.org/people/InspectorJ/sounds/416372/ -->
-    <!-- Для демо — используем гейгер, как имитацию радиационного фона -->
-  </audio>
+  <!-- Скрытый паспорт для экспорта -->
+  <div id="passport">
+    <div class="passport-header">ORDO MECHANICUS TECHNICAL PASSPORT</div>
+    <div class="passport-field"><span class="field-label">NAME:</span> <span class="field-value">DANYA "ELECTRON" VOLKOV</span></div>
+    <div class="passport-field"><span class="field-label">RANK:</span> <span class="field-value">SCRIBE-ANALYST (PROVISIONAL)</span></div>
+    <div class="passport-field"><span class="field-label">MISSION:</span> <span class="field-value">BURAN-4 RECON / ZARYA-9 REACTOR</span></div>
+    <div class="passport-field"><span class="field-label">COORDINATES:</span> <span class="field-value">45.6307°N, 63.3322°E</span></div>
+    <div class="passport-field"><span class="field-label">AUTH. HASH:</span> <span class="field-value" id="passport-hash">7A3F...E9C1</span></div>
+    <div class="passport-field"><span class="field-label">WARNINGS:</span> <span class="field-value">RADIATION • PSYCHIC ECHO • NO RETURN PROTOCOL</span></div>
+    <div class="seal">✠ MACHINA SACRA ✠</div>
+  </div>
 
   <script>
-    // === CONFIG ===
-    const reactorSound = document.getElementById('reactor-sound');
+    // === Библиотеки из CDN ===
+    const { jsPDF } = window.jspdf;
+
+    // === STATE ===
+    let phase = localStorage.getItem('buran4_phase') || 'prelude';
+    let chatActive = false;
+    let xorSolved = false;
+    let gpsRunning = false;
+
     const terminal = document.getElementById('terminal');
     const input = document.getElementById('command-input');
-    const comicPanel = document.getElementById('comic-panel');
-    const comicText = document.getElementById('comic-text');
+    const chatPanel = document.getElementById('chat-panel');
+    const chatMessages = document.getElementById('chat-messages');
+    const xorPuzzle = document.getElementById('xor-puzzle');
+    const xorGrid = document.getElementById('xor-grid');
+    const xorResult = document.getElementById('xor-result');
+    const mapContainer = document.getElementById('map-container');
+    const gpsTracker = document.getElementById('gps-tracker');
+    const exportBtn = document.getElementById('export-pdf');
 
-    let phase = localStorage.getItem('buran4_phase') || 'intro';
-    let messages = [];
-    let currentMessageIndex = 0;
+    // === Реальный звук реактора через Web Audio API ===
+    let audioContext, gainNode, oscillator1, oscillator2, noiseBuffer;
 
-    // Запуск звука после первого взаимодействия (из-за политики браузеров)
-    document.body.addEventListener('click', () => {
-      if (reactorSound.paused) {
-        reactorSound.volume = 0.2;
-        reactorSound.play().catch(e => console.warn("Audio play failed:", e));
+    function initReactorSound() {
+      try {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioContext.createGain();
+        gainNode.gain.value = 0.15; // тихо, но ощутимо
+
+        // Основной гул ~17 Гц (инфразвук, но слышен как вибрация)
+        oscillator1 = audioContext.createOscillator();
+        oscillator1.type = 'sine';
+        oscillator1.frequency.value = 17.3;
+
+        // Модуляция + шум
+        oscillator2 = audioContext.createOscillator();
+        oscillator2.type = 'triangle';
+        oscillator2.frequency.value = 0.3; // LFO
+
+        const lfoGain = audioContext.createGain();
+        lfoGain.gain.value = 2.0;
+        oscillator2.connect(lfoGain);
+        lfoGain.connect(oscillator1.frequency);
+
+        // Белый шум (для "треска")
+        const bufferSize = audioContext.sampleRate * 2; // 2 секунды
+        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          output[i] = Math.random() * 2 - 1;
+        }
+        const noiseSource = new AudioBufferSourceNode(audioContext, { buffer: noiseBuffer });
+        noiseSource.loop = true;
+        const noiseGain = audioContext.createGain();
+        noiseGain.gain.value = 0.03;
+
+        // Соединяем
+        oscillator1.connect(gainNode);
+        noiseSource.connect(noiseGain);
+        noiseGain.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator1.start();
+        oscillator2.start();
+        noiseSource.start();
+
+        // Периодические "импульсы" — как помехи
+        setInterval(() => {
+          if (audioContext.state === 'running') {
+            const impulse = audioContext.createBufferSource();
+            const impulseBuffer = audioContext.createBuffer(1, 100, audioContext.sampleRate);
+            const impulseData = impulseBuffer.getChannelData(0);
+            for (let i = 0; i < 100; i++) impulseData[i] = Math.sin(i * 0.2) * Math.exp(-i / 20);
+            impulse.buffer = impulseBuffer;
+            const impGain = audioContext.createGain();
+            impGain.gain.value = 0.2;
+            impulse.connect(impGain);
+            impGain.connect(gainNode);
+            impulse.start();
+          }
+        }, 12000 + Math.random() * 8000);
+      } catch (e) {
+        console.warn("Audio init failed:", e);
       }
+    }
+
+    // Запуск звука по клику (обход политики браузеров)
+    document.body.addEventListener('click', () => {
+      if (!audioContext) initReactorSound();
     }, { once: true });
 
     // === UTILS ===
-    function typeText(text, delay = 30, callback = null) {
+    function typeText(text, delay = 25, callback = null) {
       const lines = text.split('\n');
       let i = 0;
       const interval = setInterval(() => {
         if (i < lines.length) {
-          terminal.innerHTML += `<div>${lines[i]}</div>`;
-          terminal.scrollTop = terminal.scrollHeight;
+          log(lines[i]);
           i++;
         } else {
           clearInterval(interval);
-          if (callback) callback();
+          if (callback) setTimeout(callback, 300);
         }
-      }, delay * 10);
-    }
-
-    function timestamp() {
-      const now = new Date();
-      return `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}]`;
+      }, delay);
     }
 
     function log(msg, cls = '') {
-      terminal.innerHTML += `<div class="${cls}"><span class="timestamp">${timestamp()}</span> ${msg}</div>`;
+      const now = new Date();
+      const ts = `[${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().padStart(2,'0')}]`;
+      terminal.innerHTML += `<div class="${cls}"><span class="timestamp">${ts}</span> ${msg}</div>`;
       terminal.scrollTop = terminal.scrollHeight;
     }
 
-    function showComic(name, text) {
-      comicText.textContent = text;
-      comicPanel.classList.add('active');
-      setTimeout(() => comicPanel.classList.remove('active'), 6000);
+    function chat(msg, from = 'them') {
+      const div = document.createElement('div');
+      div.className = `chat-msg ${from}`;
+      div.textContent = msg;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // === SCENES ===
+    // === СЦЕНЫ ===
     const scenes = {
-      intro: () => {
+      prelude: () => {
         typeText(`
-> SYSTEM INIT...
-> LOADING 'ELECTRON' PROFILE...
-> WELCOME, DANYA.
-> CONNECTION ESTABLISHED — ENCRYPTED CHANNEL (AES-256 / ONETIME PAD)
+> SYSTEM INIT — TECH-PRIEST KERNEL v4.1
+> LOADING PROFILE: DANYA "ELECTRON" VOLKOV
+> LOCATION: MOSCOW, USSR — 21 DEC 1991 — 23:47
 
-> CONTEXT:
-  - DATE: 21 DEC 1991
-  - LOCATION: MOSCOW, USSR (STATUS: COLLAPSING)
-  - OPERATION: BURAN-4 RECON
-  - TARGET: SECRET FACILITY (COORDINATES PURCHASED VIA DARKNET)
+> BACKGROUND:
+  - BURAN-4: CLASSIFIED SOVIET PROJECT (1985–1989)
+  - OFFICIALLY: SHUTTLE UPGRADE
+  - TRUTH: THORIUM REACTOR CORE "ZARYA-9" — SELF-SUSTAINING, PSYCHOTROPIC EMISSIONS
 
-  [RECENT TRANSACTIONS]
-  > 18 DEC 1991: PAYMENT SENT (3 BTC — via anonymized mixer)
-  > 19 DEC 1991: RECEIVED PHYSICAL FLASH DRIVE (USB 1.0, ENCRYPTED)
-  > 20 DEC 1991: FLASH DRIVE INSERTED. HASH VERIFIED: 7a3f...e9c1
+> INTEL:
+  - AMERICAN "LEAK" CONFIRMED: FALSE FLAG
+  - COORDINATES PLANTED TO LURE INVESTIGATORS
+  - 3 TEAMS VANISHED SINCE NOV 1991
 
-  [FLASH CONTENTS:]
-    - MAP_FRAGMENT_01.BIN
-    - AUDIO_LOG_BURAN4_07.WAV
-    - DECRYPT_KEY_XOR.PAD
-    - _NOTE_FROM_PHANTOM.TXT
+> STATUS: NO FLASH DRIVE. NO CONTACT.
 
-> AWAITING INPUT...
-        `.trim(), 25, () => {
-          phase = 'note';
-          localStorage.setItem('buran4_phase', phase);
-          input.focus();
+> AVAILABLE COMMANDS:
+  [chat phantom] — INITIATE SECURE CHANNEL
+  [sysinfo]      — SHOW TERMINAL STATUS
+  [help]         — LIST COMMANDS
+        `.trim(), 30);
+      },
+
+      // === ЧАТ С ХАКЕРОМ ===
+      startChat: () => {
+        chatPanel.classList.add('active');
+        chatActive = true;
+        chat("Connection established. Encryption: AES-256 + one-time pad.", 'them');
+        chat("You’re late, Electron. Market’s hot tonight.", 'them');
+        log("> SECURE CHANNEL OPEN — AWAITING INPUT");
+      },
+
+      negotiate: (msg) => {
+        const lower = msg.toLowerCase();
+        if (lower.includes('price') || lower.includes('сколько')) {
+          chat("3 BTC. Or 5, if you want the *real* coordinates — not the CIA plant.", 'them');
+          chat("I know you’ve got stash from that Mir hack.", 'them');
+        } else if (lower.includes('where') || lower.includes('где')) {
+          chat("Three options:", 'them');
+          chat("1) Gorky Park — dead drop (high risk: FSB patrols)", 'them');
+          chat("2) Chernobyl Exclusion Zone — old reactor office (radiation: 1.1 mSv/h)", 'them');
+          chat("3) Baikonur perimeter — fake guard post (most dangerous, but cleanest data)", 'them');
+          chat("Choose. Timer starts now.", 'them');
+        } else if (lower.includes('baikonur') || lower.includes('3')) {
+          chat("Confirmed. Flash drive in locker #7, post 'Zarya'.", 'them');
+          chat("Password: your birth year XOR 1984.", 'them');
+          chat("Move fast. They’re watching the satellites.", 'them');
+          setTimeout(() => {
+            log("[SYS] FLASH DRIVE ACQUIRED. HASH: 7A3F...E9C1");
+            phase = 'flash';
+            localStorage.setItem('buran4_phase', phase);
+            chatPanel.classList.remove('active');
+            chatActive = false;
+            scenes.flashIntro();
+          }, 2000);
+        } else if (lower.includes('park') || lower.includes('1')) {
+          chat("...You hear sirens in the distance.", 'them');
+          chat("Connection lost.", 'them');
+          setTimeout(() => {
+            log("[ALERT] FSB RAID — TERMINAL COMPROMISED", 'err');
+            log("> REBOOTING IN 5s...", 'warn');
+            setTimeout(() => {
+              terminal.innerHTML = '';
+              phase = 'prelude';
+              localStorage.setItem('buran4_phase', phase);
+              scenes.prelude();
+            }, 5000);
+          }, 1500);
+          return;
+        } else {
+          chat("Be specific. I don’t do riddles.", 'them');
+        }
+      },
+
+      flashIntro: () => {
+        typeText(`
+> FLASH DRIVE INSERTED: USB 1.0 (Soviet clone)
+> CONTENTS:
+   - MAP_FRAGMENT_01.BIN        [LOCKED]
+   - AUDIO_LOG_BURAN4_07.WAV    [CAUTION: Δf=17.3Hz]
+   - DECRYPT_KEY_XOR.PAD        [CORRUPT — RECONSTRUCT REQUIRED]
+   - _NOTE_FROM_PHANTOM.TXT     [READ]
+
+> EXECUTING: cat _NOTE_FROM_PHANTOM.TXT
+        `.trim(), 30, () => {
+          setTimeout(() => {
+            typeText(`
+--- NOTE ---
+Danya,
+
+The key’s scrambled. Soviets used XOR with rotating seed.
+Rebuild it — the CRC32 must match: 0x9A3F2C1D.
+
+If you fail, the map self-wipes.
+
+And Danya… if the reactor hum changes pitch — *run*.
+
+— P.
+--- END ---
+            `.trim(), 25, () => {
+              log("\n> OPTIONS:");
+              log("  [1] REPAIR XOR KEY");
+              log("  [2] PLAY AUDIO LOG");
+              log("  [3] ANALYZE MAP (LOCKED)");
+            });
+          }, 800);
         });
       },
 
-      note: () => {
-        log("> EXECUTING: cat _NOTE_FROM_PHANTOM.TXT");
-        setTimeout(() => {
-          typeText(`
---- BEGIN NOTE ---
-Danya,
+      // === XOR ГОЛОВОЛОМКА ===
+      showXOR: () => {
+        xorPuzzle.classList.add('active');
+        xorGrid.innerHTML = '';
 
-We found it. Buran-4 isn’t a shuttle. It’s a *reactor core* — self-sustaining, thorium-based, 
-prototype code-named "Zarya-9". Buried under Site-12 near Baikonur.
+        // Исходные байты (перемешаны)
+        const shuffled = ['1A', 'F3', '0C', 'B7', '88', '41', 'E2', 'D5'];
+        const correct = ['1A', '0C', '41', '88', 'B7', 'E2', 'F3', 'D5']; // правильный порядок
 
-Soviets shut it down in '89… but telemetry from KH-11 showed *heat signatures* as of last week.
+        shuffled.forEach(byte => {
+          const el = document.createElement('div');
+          el.className = 'xor-byte';
+          el.textContent = byte;
+          el.draggable = true;
+          el.dataset.value = byte;
 
-They lied. It’s still alive.
-
-The coordinates you bought? They’re real. But be careful — 
-the Americans didn’t "leak" them. They *planted* them. 
-This is bait. You’re walking into a trap… or a tomb.
-
-— Phantom (ex-NSA, now ghost)
---- END NOTE ---
-
-> SYSTEM WARNING: AUDIO_LOG_BURAN4_07.WAV CONTAINS HIGH-INTENSITY ACUSTIC ANOMALY (Δf = 17.3 Hz)
-> PLAYBACK MAY INDUCE NAUSEA / VISUAL DISTORTION.
-
-> OPTIONS:
-  [1] PLAY AUDIO_LOG_BURAN4_07.WAV
-  [2] DECRYPT MAP_FRAGMENT_01.BIN
-  [3] ANALYZE DECRYPT_KEY_XOR.PAD
-  [4] IGNORE — PREPARE FOR INSERTION (COORDINATES: 45.6307° N, 63.3322° E)
-          `.trim(), 30, () => {
-            input.focus();
+          el.addEventListener('dragstart', (e) => {
+            e.dataTransfer.setData('text/plain', byte);
+            el.classList.add('dragging');
           });
-        }, 800);
+
+          el.addEventListener('dragend', () => {
+            el.classList.remove('dragging');
+          });
+
+          xorGrid.appendChild(el);
+        });
+
+        // Дропзоны
+        for (let i = 0; i < 8; i++) {
+          const drop = document.createElement('div');
+          drop.className = 'xor-dropzone';
+          drop.dataset.index = i;
+          drop.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            drop.style.borderColor = '#0f0';
+          });
+          drop.addEventListener('dragleave', () => {
+            drop.style.borderColor = '#080';
+          });
+          drop.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const byte = e.dataTransfer.getData('text/plain');
+            const dragged = xorGrid.querySelector(`[data-value="${byte}"]`);
+            if (dragged && !drop.textContent) {
+              drop.textContent = byte;
+              dragged.style.display = 'none';
+            }
+            drop.style.borderColor = '#080';
+          });
+          xorGrid.appendChild(drop);
+        }
+
+        document.getElementById('xor-submit').onclick = () => {
+          const order = Array.from(xorGrid.querySelectorAll('.xor-dropzone'))
+            .map(d => d.textContent || '??');
+          const crc = crc32(order.join(''));
+          if (crc === 0x9A3F2C1D) {
+            xorResult.innerHTML = '<span style="color:#afa">✓ CRC MATCH — KEY RECONSTRUCTED</span>';
+            log("> KEY REPAIRED. MAP UNLOCKED.");
+            xorSolved = true;
+            setTimeout(() => {
+              xorPuzzle.classList.remove('active');
+              log("\n> EXECUTING: decrypt MAP_FRAGMENT_01.BIN");
+              log("[OK] MAP DECRYPTED. DISPLAYING ROUTE...");
+              setTimeout(() => scenes.showMap(), 1000);
+            }, 1500);
+          } else {
+            xorResult.innerHTML = `<span class="err">✗ CRC FAIL — EXPECTED 0x9A3F2C1D, GOT 0x${crc.toString(16).toUpperCase().padStart(8,'0')}</span>`;
+          }
+        };
+      },
+
+      // === КАРТА ===
+      showMap: () => {
+        mapContainer.classList.add('active');
+        log("> INITIATING GPS ROUTE TO BURAN-4");
+        log("  START: Baikonur Perimeter Gate");
+        log("  TARGET: 45.6307°N, 63.3322°E");
+        log("  DISTANCE: 14.3 km");
+
+        setTimeout(() => {
+          gpsRunning = true;
+          gpsTracker.style.transition = 'left 12s linear';
+          gpsTracker.style.left = '85%';
+
+          // Тревоги по пути
+          setTimeout(() => {
+            log("[WARN] RAD SPIKE — 2.4 mSv/h", 'warn');
+          }, 3000);
+
+          setTimeout(() => {
+            log("[ALERT] MOTION DETECTED — 300m AHEAD", 'err');
+            log("         [CAM-7] FEED LOST");
+          }, 6000);
+
+          setTimeout(() => {
+            log("[SYS] ARRIVED AT COORDINATES");
+            log("      STRUCTURE DETECTED: BURIED CONCRETE DOME (DIAM: 48m)");
+            log("      ENTRANCE: AIRLOCK Ψ — POWER: STANDBY");
+            log("\n> FINAL COMMANDS:");
+            log("  [open airlock] — INITIATE ENTRY");
+            log("  [scan perimeter] — LOOK FOR TRAPS");
+          }, 11000);
+        }, 500);
       }
     };
 
-    // === INPUT HANDLER ===
+    // === CRC32 (упрощённая, для демо) ===
+    function crc32(str) {
+      let crc = 0xffffffff;
+      const bytes = new TextEncoder().encode(str);
+      for (let b of bytes) {
+        crc ^= b;
+        for (let i = 0; i < 8; i++) {
+          crc = (crc & 1) ? (crc >>> 1) ^ 0xEDB88320 : crc >>> 1;
+        }
+      }
+      return (~crc >>> 0);
+    }
+
+    // === ЭКСПОРТ В PDF ===
+    exportBtn.onclick = () => {
+      log("> GENERATING TECHNICAL PASSPORT...", 'sys');
+      html2canvas(document.getElementById('passport')).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.setFont('helvetica');
+        pdf.addImage(imgData, 'PNG', 10, 10, 190, 250);
+        pdf.save('TECH-PRIEST_PASSPORT_ELECTRON.pdf');
+        log("[OK] PASSPORT EXPORTED", 'sys');
+      }).catch(e => {
+        log(`[ERR] PDF EXPORT FAILED: ${e.message}`, 'err');
+      });
+    };
+
+    // === КОМАНДЫ ===
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
-        const cmd = input.value.trim().toLowerCase();
+        const cmd = input.value.trim();
         log(`> ${cmd}`);
         input.value = '';
 
-        if (phase === 'intro') {
-          log("ERR: SYSTEM NOT READY. WAIT FOR INIT...");
+        // Чат активен — отправляем в него
+        if (chatActive) {
+          chat(cmd, 'me');
+          scenes.negotiate(cmd);
           return;
         }
 
-        if (phase === 'note') {
-          switch (cmd) {
-            case '1':
-            case 'play audio':
-              log("> EXECUTING: play AUDIO_LOG_BURAN4_07.WAV");
-              setTimeout(() => {
-                log("[AUD] ▶ PLAYBACK STARTED...", 'blink');
-                // Здесь можно добавить воспроизведение реального звука (низкочастотный гул + искажения)
-                showComic("Phantom", "Don't listen too long. Last guy who did — started seeing *wires in his skin*.");
-              }, 500);
-              break;
+        // Основные команды
+        switch (phase) {
+          case 'prelude':
+            if (cmd === 'chat phantom') {
+              scenes.startChat();
+            } else if (cmd === 'sysinfo') {
+              log("TERMINAL: RETRO-91 KERNEL v2.1");
+              log("MEMORY: 4 MB RAM (3.2 MB FREE)");
+              log("STORAGE: 20 MB HDD (FLASH MOUNTED AT /dev/sdb1)");
+              log("SOUND: REACTOR CORE SIM — ACTIVE");
+            } else if (cmd === 'help') {
+              log("COMMANDS: chat phantom | sysinfo | help");
+            } else {
+              log("ERR: COMMAND NOT RECOGNIZED", 'err');
+            }
+            break;
 
-            case '2':
-            case 'decrypt map':
-              log("> DECRYPTING MAP_FRAGMENT_01.BIN...");
-              setTimeout(() => {
-                log("[OK] MAP DECRYPTED. DISPLAYING COORDINATE OVERLAY.");
-                log("      [██████████████████] 100%");
-                log("      TARGET: BAikonur Perimeter — Sector Ψ (Psi)");
-                log("      WARNING: RAD LEVELS ↑ 4.7 mSv/h (NORMAL: 0.03)");
-                showComic("Danya", "This isn’t a base. It’s a *sarcophagus*… and something’s breathing inside.");
-                // → переход к следующей фазе (например, карта)
-              }, 1200);
-              break;
+          case 'flash':
+            if (cmd === '1' || cmd === 'repair xor') {
+              scenes.showXOR();
+            } else if (cmd === '2' || cmd === 'play audio') {
+              log("[AUD] ▶ PLAYING AUDIO_LOG_BURAN4_07.WAV", 'sys');
+              log("      [!] HEAR THAT PITCH SHIFT? IT’S NOT SUPPOSED TO DO THAT.", 'warn');
+            } else if (cmd === 'open airlock' && xorSolved) {
+              log("> INITIATING AIRLOCK Ψ SEQUENCE...");
+              log("[DOOR] HISS — HYDRAULICS ENGAGED");
+              log("[LIGHT] GREEN → AMBER → RED");
+              log("[VOICE] *...welcome...home...* (distorted)");
+              log("\n> [ENTER] TO STEP INSIDE — OR TYPE 'abort'");
+              // → Следующая фаза: внутрь реактора...
+            } else {
+              log("ERR: MAP LOCKED — REPAIR KEY FIRST", 'err');
+            }
+            break;
 
-            case '4':
-            case 'prepare':
-              log("> INITIATING INSERTION PROTOCOL...");
-              setTimeout(() => {
-                log("[SYS] PACKING: Geiger counter, NVG (Gen 1), EMP flashbang, cipher wheel.");
-                log("[GPS] LOCKED ON: 45.6307°N, 63.3322°E");
-                log("[MSG] Phantom just sent: \"If the lights go out — don’t turn them back on.\"");
-                log("\n> PRESS [ENTER] TO BEGIN INSERTION...");
-                // → переход к экрану выезда на местность (следующая страница или сцена)
-              }, 1000);
-              break;
-
-            default:
-              log(`ERR: UNKNOWN COMMAND '${cmd}'. TRY: 1, 2, 3, or 4`);
-          }
+          default:
+            log("ERR: UNKNOWN STATE", 'err');
         }
       }
     });
 
-    // === START ===
+    // === СТАРТ ===
     window.addEventListener('load', () => {
-      log("> BOOTING CRT MONITOR v2.1 (RETRO-91 KERNEL)");
+      log("> BOOTING TECH-PRIEST TERMINAL...", 'sys');
       setTimeout(() => {
-        scenes.intro();
+        if (phase === 'flash') {
+          scenes.flashIntro();
+        } else {
+          scenes.prelude();
+        }
       }, 800);
     });
   </script>
